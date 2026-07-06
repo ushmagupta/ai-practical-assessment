@@ -1,9 +1,6 @@
-src/backend/web/sites/*/settings.local.php
-src/backend/web/sites/*/files/
-src/backend/vendor/
-src/frontend/node_modules/
-src/frontend/build/
-src/frontend/dist/
+src/web/sites/*/settings.local.php
+src/web/sites/*/files/
+src/vendor/
 .env
 .env.local
 .DS_Store

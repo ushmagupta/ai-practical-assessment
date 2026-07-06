@@ -6,7 +6,7 @@
 
 ## My Understanding (in your own words)
 
-This is an internal support ticket system built with Drupal 10 (backend) and React/Vite (frontend). Users authenticate via Drupal session-based auth; the React app uses protected routes and redirects unauthenticated users.
+This is an internal support ticket system built entirely on Drupal 10 — custom module, custom theme, Form API, Controllers, and Views under `src/`. There is no separate frontend application. Users authenticate via Drupal core session-based auth; anonymous users are redirected to login via route access control.
 
 There is one **Admin** (Drupal default super admin) plus two sub-roles: **Agent** and **Reporter**. Admins manage users (full CRUD), see all tickets, and have full ticket/comment/transition access. Agents work a queue of assigned and unassigned tickets—they can create, update, comment, change assignee, and perform status transitions, but cannot manage users. Reporters create tickets and comments on their own tickets, can update their own ticket fields, but cannot change status or assignee.
 
@@ -21,7 +21,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 ### Authentication & Authorization
 
 - FR-1: Implement login/logout using **Drupal session-based authentication**.
-- FR-2: Protect all React routes; redirect unauthenticated users to login.
+- FR-2: Protect all Drupal routes via permissions and custom access checks; redirect anonymous users to login.
 - FR-3: Enforce authorization on every write API endpoint—verify role and resource access, not just session validity.
 - FR-4: Roles: **Admin** (Drupal super admin, one account), **Agent**, **Reporter**. Enforce via Drupal permissions and custom access checks server-side.
 
@@ -95,25 +95,30 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - FR-40: **Agent:** assigned tickets and unassigned tickets only (work queue).
 - FR-41: **Reporter:** own tickets only (created by them).
 
+### UI (Drupal)
+
+- FR-42: Deliver all user-facing screens via Drupal — custom theme (Twig), Form API, Controllers, and Views (no separate SPA).
+- FR-43: Ticket list, detail, create/edit forms, comment forms, user management pages, and search/filter UI rendered server-side with role-appropriate elements shown or hidden (access still enforced server-side).
+
 ### API & Documentation
 
-- FR-42: Expose APIs via **both REST and JSON:API** as appropriate per resource.
-- FR-43: Structured error shape: `{ "error": { "code", "message", "field" } }`.
-- FR-44: Provide API documentation (OpenAPI/Swagger).
+- FR-44: Expose APIs via **both REST and JSON:API** from Drupal as appropriate per resource (optional for integrations; primary UI is Drupal-rendered).
+- FR-45: Structured error shape: `{ "error": { "code", "message", "field" } }` for API responses; equivalent validation messages on Drupal forms.
+- FR-46: Provide API documentation (OpenAPI/Swagger).
 
 ### Infrastructure & Testing
 
-- FR-45: Docker setup for local/runtime environment.
-- FR-46: CI workflow.
-- FR-47: Integration tests for the status state machine; unit tests and edge-case/failure tests.
+- FR-47: Docker setup for local/runtime environment.
+- FR-48: CI workflow.
+- FR-49: Integration tests for the status state machine; unit tests and edge-case/failure tests (Drupal Kernel/Functional tests).
 
 ## Non-Functional Requirements
 
-- NFR-1: Backend validation and authorization are the source of truth; frontend validation is UX-only.
+- NFR-1: Server-side validation and authorization are the source of truth; client-side/form validation is UX-only.
 - NFR-2: Never rely on hiding UI elements alone for access control—all rules enforced server-side.
 - NFR-3: No secrets in source code; use `.env` / `settings.local.php` (git-ignored).
 - NFR-4: Clear 4xx errors for validation, authorization, and invalid state transitions.
-- NFR-5: Stack: Drupal 10 custom module (`src/backend`), React/Vite (`src/frontend`), MySQL/MariaDB.
+- NFR-5: Stack: Drupal 10 monolith — custom module + custom theme (`src/`), MySQL/MariaDB. No separate frontend app.
 
 ## Assumptions
 
@@ -126,7 +131,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - A-7: Admin cancelled-ticket visibility: all non-cancelled tickets shown by default; Admin uses status filter to include/view cancelled tickets.
 - A-8: Reporter "update own ticket" excludes status, assignee, and applies only while ticket is not Closed or Cancelled.
 - A-9: The single Admin maps to Drupal's built-in super-administrator (uid 1 or equivalent).
-- A-10: JWT decoupled auth is **not** used; session auth only per decision.
+- A-10: Drupal-only monolith — no decoupled SPA; session auth via Drupal core.
 
 ## Clarifications (questions for a product owner)
 
@@ -146,7 +151,8 @@ The following were resolved during requirements gathering:
 | Cancelled visibility | Admin filter dropdown; closed in default list |
 | Pagination / sort | Page size 5; default sort `createdAt`; sort by createdAt, updatedAt, priority, status |
 | User deletion | Blocked if user assigned to any ticket; Admin cannot self-delete |
-| API style | REST and JSON:API |
+| Architecture | Drupal-only monolith (module + theme); no React/Vite SPA |
+| API style | REST and JSON:API (from Drupal) |
 | Bootstrap Admin | Manual DB |
 | Roles | One Admin (super admin) + Agent + Reporter sub-roles |
 

@@ -2,6 +2,5 @@
 
 ## Prerequisites
 ## Database Setup
-## Running Locally (Backend)
-## Running Locally (Frontend)
+## Running Locally
 ## Running Tests
