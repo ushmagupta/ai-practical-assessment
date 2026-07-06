@@ -16,8 +16,6 @@ it filled in requirements-analysis.md following the existing template headers.
 **Accepted:**
 All sections like Functional requirements, Non functional requirements, clarifications, edge cases section
 
-**Commit:**
-
 ## july 6 — Architecture decision: Drupal-only monolith
 
 **Prompt:**
@@ -32,8 +30,6 @@ under src/, with Drupal-rendered UI (Forms, Twig, Views) and session auth only.
 
 **Accepted:**
 Drupal-only architecture across all project documentation.
-
-**Commit:**
 
 ## july 6 — Assignment logic and ticket type field updates
 
@@ -50,8 +46,6 @@ type as assumption/addition, rewrote FRs/assumptions/edge cases.
 
 **Accepted:**
 Manual assignment rules and ticket type as categorization-only across project docs.
-
-**Commit:**
 
 ## july 6 — Acceptance criteria from requirements analysis
 
@@ -71,8 +65,6 @@ or admin-capable before adding criteria.
 **Accepted:**
 Core, Validation, Error Handling, Testing, and Documentation sections populated
 with FR-traced checklist items.
-
-**Commit:**
 
 ## July 6, 2026 — Resolved C-1, added missing assumptions
 
@@ -103,4 +95,56 @@ time.
 **Rejected:**
 None.
 
-**Commit:**
+## July 6, 2026 — Documented architecture deviation: no API layer exposed
+
+**Prompt:**
+Record architecture deviation across requirements-analysis.md, api-contract.md,
+and acceptance-criteria.md: Drupal monolith only, no REST/JSON:API or OpenAPI;
+add Architecture Deviation section after Selected Project Option; mark FR-48 and
+FR-50 OUT OF SCOPE in place; replace api-contract.md with N/A placeholder;
+descope FR-48/FR-50 acceptance criteria lines with reason. Do not touch
+design-notes.md, ui-flow.md, or data-model.md.
+
+**AI response summary:**
+Added "Architecture Deviation from Source Document" section to
+requirements-analysis.md; marked FR-48 and FR-50 OUT OF SCOPE in the Functional
+Requirements list; replaced api-contract.md with placeholder pointing back to
+requirements-analysis.md; converted FR-48 and FR-50 acceptance criteria from
+checklist items to descoped notes. Fixed accidental line break in acceptance-criteria.md.
+
+**Accepted:**
+Architecture deviation documented across requirements-analysis.md,
+api-contract.md, and acceptance-criteria.md; FR-48/FR-50 history preserved as
+OUT OF SCOPE markers.
+
+**Changed:**
+Deliberate scope decision made after discussion — directed by me, not an
+AI-driven change.
+
+**Rejected:**
+None.
+
+## July 6, 2026 — Corrected and removed JSON error shape, now describes Drupal form/page-based error handling
+
+**Prompt:**
+Remove JSON error shape from requirements-analysis.md (FR-49) and replace with
+Drupal Form API inline validation + access-denied/error pages; update
+acceptance-criteria.md for JSON/API error response references; append planning log.
+
+**AI response summary:**
+Rewrote FR-49 and NFR-4 in requirements-analysis.md for Drupal-only error handling
+(inline form errors, access-denied pages). Updated acceptance-criteria.md Error
+Handling section — removed JSON error shape and API error response checklist items;
+replaced with Drupal form validation and access-denied criteria (FR-49, FR-27,
+FR-19, FR-29, FR-3, NFR-4, EC-* citations preserved).
+
+**Accepted:**
+FR-49 and NFR-4 describe Drupal form/page-based errors only; acceptance-criteria
+Error Handling section aligned; JSON error shape removed entirely.
+
+**Changed:**
+Leftover from earlier API-based draft, caught during review after the architecture
+deviation was documented — not something the AI flagged on its own.
+
+**Rejected:**
+None.

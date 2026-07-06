@@ -4,6 +4,27 @@
 
 **Support Ticket Management System** — internal tool for creating, updating, commenting on, searching, and progressing support tickets through a status lifecycle, with authentication, role-based access, and full user management.
 
+## Architecture Deviation from Source Document
+
+Doc 1's Common Technical Requirements list two separate mandatory deliverables:
+"Frontend application" (item 1) and "Backend API" (item 2). This submission
+deviates from that: the system is a fully server-rendered Drupal 10 monolith
+(custom module + custom theme, Form API, Controllers, Views) with no exposed
+REST/JSON:API layer and no separate frontend application. Drupal's own
+rendering layer serves as the sole user interface; there is no API consumed by
+a separate client.
+
+This is a deliberate scope decision, not an oversight, made to keep the
+submission focused on a single, cohesive Drupal architecture rather than
+splitting effort across a decoupled frontend and an API contract that nothing
+else would consume.
+
+Consequence: FR-48 (REST/JSON:API exposure) and FR-50 (OpenAPI/Swagger
+documentation) are considered out of scope for this submission, superseding
+earlier drafts of this document that included them. api-contract.md is not
+maintained as a live deliverable for this reason — see that file for a short
+note pointing back here.
+
 ## My Understanding (in your own words)
 
 This is an internal support ticket system built entirely on Drupal 10 — custom module, custom theme, Form API, Controllers, and Views under `src/`. There is no separate frontend application. Users authenticate via Drupal core session-based auth; anonymous users are redirected to login via route access control.
@@ -111,9 +132,9 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 
 ### API & Documentation
 
-- FR-48: Expose APIs via **both REST and JSON:API** from Drupal as appropriate per resource (optional for integrations; primary UI is Drupal-rendered).
-- FR-49: Structured error shape: `{ "error": { "code", "message", "field" } }` for API responses; equivalent validation messages on Drupal forms.
-- FR-50: Provide API documentation (OpenAPI/Swagger).
+- FR-48: Expose APIs via **both REST and JSON:API** from Drupal as appropriate per resource (optional for integrations; primary UI is Drupal-rendered). **OUT OF SCOPE — see Architecture Deviation note above**
+- FR-49: **Validation errors** are surfaced via Drupal Form API **inline field-level messages** on forms (error text displayed adjacent to the offending field). **Authorization failures** use Drupal's standard **access-denied and error pages** (e.g. 403 Access Denied for insufficient permissions; login redirect for anonymous users on protected routes).
+- FR-50: Provide API documentation (OpenAPI/Swagger). **OUT OF SCOPE — see Architecture Deviation note above**
 
 ### Infrastructure & Testing
 
@@ -126,7 +147,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - NFR-1: Server-side validation and authorization are the source of truth; client-side/form validation is UX-only.
 - NFR-2: Never rely on hiding UI elements alone for access control—all rules enforced server-side.
 - NFR-3: No secrets in source code; use `.env` / `settings.local.php` (git-ignored).
-- NFR-4: Clear 4xx errors for validation, authorization, and invalid state transitions.
+- NFR-4: Clear, user-visible feedback for validation failures (inline form errors), authorization failures (access-denied pages), and invalid state transitions (form-level rejection with explanatory message).
 - NFR-5: Stack: Drupal 10 monolith — custom module + custom theme (`src/`), MySQL/MariaDB. No separate frontend app.
 
 ## Assumptions

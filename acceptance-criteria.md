@@ -11,8 +11,7 @@
 - [ ] Ticket is not auto-assigned on create; assignedTo remains null until manual assignment (FR-15, A-3)
 - [ ] Admin and Agent can assign or reassign a ticket to an Agent-role user (FR-16, FR-17)
 - [ ] Agent can self-assign an unassigned ticket (FR-18, EC-15)
-- [ ] Reporter cannot se
-e assignedTo in ticket UI or API responses (FR-19, FR-45, EC-7)
+- [ ] Reporter cannot see assignedTo in ticket UI or API responses (FR-19, FR-45, EC-7)
 - [ ] Reporter can update own tickets (title, description, type, priority) while ticket is editable (FR-21, A-8)
 - [ ] Reporter can change type on own ticket without assignment side effect (A-8, EC-16, FR-25)
 - [ ] Closed and Cancelled tickets reject all field edits for all roles (FR-22)
@@ -33,7 +32,7 @@ e assignedTo in ticket UI or API responses (FR-19, FR-45, EC-7)
 - [ ] Reporter sees only tickets they created (FR-45)
 - [ ] All user-facing screens are delivered via Drupal theme, Form API, Controllers, and Views (FR-46, NFR-5, A-10)
 - [ ] Assignee field is visible only to Admin and Agent; role-appropriate UI elements enforced server-side (FR-47, NFR-2)
-- [ ] REST and JSON:API endpoints are exposed from Drupal for ticket resources (FR-48)
+- **Descoped (FR-48):** REST/JSON:API exposure intentionally out of scope — see "Architecture Deviation from Source Document" in requirements-analysis.md (no exposed API layer; server-rendered Drupal monolith only).
 - [ ] Valid priority values are Low, Medium, High, Critical (FR-26)
 - [ ] Ticket type accepts Technical, Billing, Account, General for categorization and filter only—not assignment (FR-24, FR-25, A-1)
 
@@ -49,16 +48,16 @@ e assignedTo in ticket UI or API responses (FR-19, FR-45, EC-7)
 - [ ] Server-side validation is authoritative; client-side/form validation is supplementary only (NFR-1)
 
 ## Error Handling
-- [ ] API error responses use shape `{ "error": { "code", "message", "field" } }` (FR-49)
-- [ ] Drupal forms show equivalent validation messages for field errors (FR-49)
-- [ ] Invalid status transition returns 4xx with structured error regardless of role (FR-27, NFR-4, EC-3)
-- [ ] Reporter assignment attempt (form or API) returns 403/4xx (FR-19, EC-1)
-- [ ] Reporter status change attempt returns 403/4xx (FR-29, EC-4)
+- [ ] Validation failures display inline field-level error messages on Drupal forms (FR-49)
+- [ ] Authorization failures show Drupal access-denied or error pages (e.g. 403, login redirect) (FR-49, FR-2)
+- [ ] Invalid status transition is rejected with a clear form-level error message regardless of role (FR-27, NFR-4, EC-3)
+- [ ] Reporter assignment attempt via form is rejected with access denied or form error (FR-19, EC-1)
+- [ ] Reporter status change attempt is rejected with access denied or form error (FR-29, EC-4)
 - [ ] Edit or comment on Closed/Cancelled ticket returns rejection (FR-22, FR-34, EC-5)
 - [ ] Reporter access to another user's ticket is denied (FR-45, EC-6)
 - [ ] Agent access to ticket outside assigned/unassigned queue is denied (FR-44, EC-8)
-- [ ] Unauthenticated write to API returns 401/403 (FR-3, EC-12)
-- [ ] Write API without sufficient role/resource access returns 403/4xx (FR-3)
+- [ ] Unauthenticated access to protected routes redirects to login or shows access denied (FR-3, FR-2, EC-12)
+- [ ] Insufficient role or resource access shows Drupal access-denied page (FR-3)
 - [ ] Concurrent update after ticket moved to Closed is rejected (EC-13)
 
 ## Testing
@@ -68,7 +67,7 @@ e assignedTo in ticket UI or API responses (FR-19, FR-45, EC-7)
 - [ ] CI workflow runs automated tests on push/PR (FR-52)
 
 ## Documentation
-- [ ] OpenAPI/Swagger documentation covers exposed REST/JSON:API endpoints (FR-50, FR-48)
+- **Descoped (FR-50, FR-48):** OpenAPI/Swagger documentation intentionally out of scope — see "Architecture Deviation from Source Document" in requirements-analysis.md (no API layer to document).
 - [ ] Docker setup instructions allow running the Drupal application locally (FR-51)
 - [ ] Initial Admin bootstrap via manual database setup is documented (FR-10, A-9)
 - [ ] No secrets committed in source; .env / settings.local.php usage documented (NFR-3)
