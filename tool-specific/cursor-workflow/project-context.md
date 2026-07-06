@@ -11,16 +11,24 @@ authentication, role-based access, and full user management.
 - UI: Drupal-rendered pages (Twig templates, Forms, Views) — no separate frontend app
 
 ## Entities
-- User: id, name, email, role, type (Agent only) — full CRUD required (create/edit/delete users via UI)
-- Ticket: id, title, description, type, priority, status, assignedTo, createdBy, createdAt, updatedAt
+- User: id, name, email, role — full CRUD required (create/edit/delete users via UI)
+- Ticket: id, title, description, type*, priority, status, assignedTo, createdBy, createdAt, updatedAt
+  (* type: assumption/addition — categorization & filter only; not in original brief)
 - Comment: id, ticketId, message, createdBy, createdAt
 
 ## Roles & Permissions
-- Admin: full access — manage users (CRUD), all tickets, all transitions, all comments
-- Agent: create/update/comment/transition tickets; cannot manage users
-- Reporter: create tickets/comments, view own tickets, no status/assign rights
+- Admin: full access — manage users (CRUD), all tickets, all transitions, all comments, assign/reassign
+- Agent: create/update/comment/transition/assign tickets; cannot manage users; may self-assign
+- Reporter: create tickets/comments, view own tickets, update own ticket fields; no status/assign rights; cannot see or set assignedTo
 Enforce all of this server-side via Drupal permissions + custom access checks — never
 rely on hiding UI elements alone.
+
+## Assignment
+- Tickets created unassigned (assignedTo = null)
+- Only Admin and Agent may assign/reassign; target must be Agent-role user
+- Agents may self-assign
+- Reporters cannot see or set assignedTo; backend rejects Reporter assignment attempts
+- No automatic assignment; ticket type does not drive assignment
 
 ## Authentication
 - Login/logout via Drupal core session-based auth
@@ -52,3 +60,4 @@ All other transitions rejected with a clear 4xx error, regardless of role.
 - No secrets in code — use .env / settings.local.php, git-ignored.
 - Structured API error shape: { "error": { "code", "message", "field" } }
 - Cite which feature/requirement above any generated code addresses.
+- Flag additions not in the original source brief (e.g. ticket type field) as assumptions.

@@ -1,5 +1,5 @@
 # AI Prompts — planning
-## july 6 11.42 — Requirement analysis for Support Ticket Management System
+## july 6 — Requirement analysis for Support Ticket Management System
 
 **Prompt:**
 Read .cursor/rules/project-context.md.
@@ -32,5 +32,23 @@ under src/, with Drupal-rendered UI (Forms, Twig, Views) and session auth only.
 
 **Accepted:**
 Drupal-only architecture across all project documentation.
+
+**Commit:**
+
+## july 6 — Assignment logic and ticket type field updates
+
+**Prompt:**
+Apply assignment and type field updates: tickets created unassigned, manual
+assignment by Admin/Agent only, self-assign allowed, Reporter cannot see/set
+assignedTo, no auto-assignment. Ticket type (Technical/Billing/Account/General)
+is categorization/filter only—assumption/addition, not original brief.
+
+**AI response summary:**
+Updated requirements-analysis.md and all project-context.md copies. Removed User
+type field and auto-assignment logic. Added Assignment section, flagged ticket
+type as assumption/addition, rewrote FRs/assumptions/edge cases.
+
+**Accepted:**
+Manual assignment rules and ticket type as categorization-only across project docs.
 
 **Commit:**
