@@ -76,7 +76,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - FR-28: **Resolved** = fix verified. **Closed** = archived (terminal).
 - FR-29: Apply **role-specific transition rules**:
   - **Admin:** may perform any valid transition on any ticket.
-  - **Agent:** may perform valid transitions on tickets in their queue (assigned to them or unassigned).
+  - **Agent:** may perform valid transitions on tickets **assigned to them** and on **unassigned tickets in the global queue**; may **not** transition tickets assigned to a different Agent.
   - **Reporter:** may not perform any status transition.
 
 ### Comments
@@ -134,13 +134,15 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - A-1: **Addition—not cited from original source brief:** Ticket `type` field (e.g. Technical, Billing, Account, General) added for categorization and search/filter. Mandatory on create alongside `title`. Does **not** drive assignment and is **not** on the User entity.
 - A-2: Tickets are created with `assignedTo = null`. Assignment is manual only, performed by Admin or Agent, targeting Agent-role users only (self-assignment permitted for Agents).
 - A-3: "Unassigned" means `assignedTo` is null; ticket remains unassigned until Admin or Agent assigns it.
-- A-4: Agent queue = tickets assigned to that Agent plus all unassigned tickets (global unassigned pool).
+- A-4: Agent queue and transition scope = tickets assigned to that Agent plus all unassigned tickets (global unassigned pool). Agent may **not** perform status transitions on tickets assigned to a different Agent.
 - A-5: Default sort direction for `createdAt` is descending (newest first).
 - A-6: Comment edit applies to `message` only; no comment deletion unless implied by edit-only scope.
 - A-7: Admin cancelled-ticket visibility: all non-cancelled tickets shown by default; Admin uses status filter to include/view cancelled tickets.
 - A-8: Reporter "update own ticket" excludes status and assignee; applies only while ticket is not Closed or Cancelled. Changing `type` does not trigger reassignment.
 - A-9: The single Admin maps to Drupal's built-in super-administrator (uid 1 or equivalent).
 - A-10: Drupal-only monolith — no decoupled SPA; session auth via Drupal core.
+- A-11: **Addition—not cited from original source brief:** Admin-only ticket deletion (FR-11, FR-20). Core features cover create/list/view/update/comment/status/search only — delete is not included.
+- A-12: **Addition—not cited from original source brief:** User deletion blocking rules (FR-8: cannot delete a user who is assignee on any ticket; FR-9: Admin cannot self-delete). Not specified in the source brief.
 
 ## Clarifications (questions for a product owner)
 
@@ -158,6 +160,7 @@ The following were resolved during requirements gathering:
 | Ticket deletion | Admin only |
 | Closed/Cancelled edits | No field edits; no new comments |
 | Comment edits | Author may edit own comment |
+| Agent status transitions | Assigned to self + global unassigned queue only; not tickets assigned to another Agent |
 | Visibility | Admin: all; Agent: assigned + unassigned queue; Reporter: own only |
 | Cancelled visibility | Admin filter dropdown; closed in default list |
 | Pagination / sort | Page size 5; default sort `createdAt`; sort by createdAt, updatedAt, priority, status |
@@ -169,7 +172,6 @@ The following were resolved during requirements gathering:
 
 **Open items for confirmation during implementation:**
 
-- C-1: Specific Agent transition permissions—can an Agent transition any ticket in their queue, or only tickets assigned to them (excluding unassigned)?
 - C-2: Comment deletion—edit-only confirmed; is delete out of scope?
 
 ## Edge Cases

@@ -1,12 +1,74 @@
 # Acceptance Criteria
 
 ## Core
-- [ ] ...
+- [ ] User can log in and log out via Drupal session authentication (FR-1)
+- [ ] Anonymous user accessing a protected route is redirected to login (FR-2)
+- [ ] Admin, Agent, and Reporter roles are enforced server-side via Drupal permissions and custom access checks (FR-4)
+- [ ] Admin can create, read, update, and delete users via the UI with fields id, name, email, role (FR-5, FR-6)
+- [ ] New user created by Admin defaults to Agent role (FR-7)
+- [ ] Admin can create, list, view, update, and delete tickets (FR-11, FR-20)
+- [ ] New ticket is created with status Open, priority Medium (if omitted), and assignedTo null (FR-14, FR-15, A-2)
+- [ ] Ticket is not auto-assigned on create; assignedTo remains null until manual assignment (FR-15, A-3)
+- [ ] Admin and Agent can assign or reassign a ticket to an Agent-role user (FR-16, FR-17)
+- [ ] Agent can self-assign an unassigned ticket (FR-18, EC-15)
+- [ ] Reporter cannot se
+e assignedTo in ticket UI or API responses (FR-19, FR-45, EC-7)
+- [ ] Reporter can update own tickets (title, description, type, priority) while ticket is editable (FR-21, A-8)
+- [ ] Reporter can change type on own ticket without assignment side effect (A-8, EC-16, FR-25)
+- [ ] Closed and Cancelled tickets reject all field edits for all roles (FR-22)
+- [ ] Valid status transitions succeed: Open→In Progress, In Progress→Resolved, Resolved→Closed, Open→Cancelled, In Progress→Cancelled (FR-27)
+- [ ] Admin can perform any valid transition on any ticket (FR-29)
+- [ ] Agent can perform valid transitions on tickets assigned to them or unassigned in their queue (FR-29, FR-44, A-4)
+- [ ] Reporter cannot perform any status transition (FR-29)
+- [ ] Resolved status represents fix verified; Closed status represents archived terminal state (FR-28)
+- [ ] Users can add comments per role: Reporter on own tickets; Agent/Admin on accessible tickets (FR-30, FR-31, FR-32)
+- [ ] User can edit their own comment message (FR-33, A-6)
+- [ ] Comments cannot be added on Closed or Cancelled tickets (FR-34)
+- [ ] Keyword search returns matching tickets (FR-36)
+- [ ] Filters by status, priority, assignee, and type work correctly (FR-37, FR-24, FR-25, A-1)
+- [ ] Admin ticket list shows all tickets; Cancelled available via status filter; Closed shown in default list (FR-38, FR-39, FR-43, A-7)
+- [ ] Default sort is createdAt descending; sortable fields are createdAt, updatedAt, priority, status (FR-40, FR-41, A-5)
+- [ ] Pagination returns 5 tickets per page (FR-42)
+- [ ] Agent sees only assigned tickets and unassigned tickets (work queue) (FR-44, A-4)
+- [ ] Reporter sees only tickets they created (FR-45)
+- [ ] All user-facing screens are delivered via Drupal theme, Form API, Controllers, and Views (FR-46, NFR-5, A-10)
+- [ ] Assignee field is visible only to Admin and Agent; role-appropriate UI elements enforced server-side (FR-47, NFR-2)
+- [ ] REST and JSON:API endpoints are exposed from Drupal for ticket resources (FR-48)
+- [ ] Valid priority values are Low, Medium, High, Critical (FR-26)
+- [ ] Ticket type accepts Technical, Billing, Account, General for categorization and filter only—not assignment (FR-24, FR-25, A-1)
+
 ## Validation
-- [ ] ...
+- [ ] Ticket create rejects missing or whitespace-only title (FR-13, EC-14)
+- [ ] Ticket create rejects missing or whitespace-only type (FR-13, A-1, EC-14)
+- [ ] Ticket title rejects input over 100 characters (FR-23, EC-11)
+- [ ] Ticket description rejects input over 1000 characters (FR-23, EC-11)
+- [ ] Comment message rejects input over 1000 characters (FR-35, EC-11)
+- [ ] assignedTo rejects any user who does not have the Agent role (FR-17, EC-2)
+- [ ] User deletion is blocked when user is assignee on any ticket (FR-8, EC-9)
+- [ ] Admin self-deletion is blocked (FR-9, EC-10)
+- [ ] Server-side validation is authoritative; client-side/form validation is supplementary only (NFR-1)
+
 ## Error Handling
-- [ ] ...
+- [ ] API error responses use shape `{ "error": { "code", "message", "field" } }` (FR-49)
+- [ ] Drupal forms show equivalent validation messages for field errors (FR-49)
+- [ ] Invalid status transition returns 4xx with structured error regardless of role (FR-27, NFR-4, EC-3)
+- [ ] Reporter assignment attempt (form or API) returns 403/4xx (FR-19, EC-1)
+- [ ] Reporter status change attempt returns 403/4xx (FR-29, EC-4)
+- [ ] Edit or comment on Closed/Cancelled ticket returns rejection (FR-22, FR-34, EC-5)
+- [ ] Reporter access to another user's ticket is denied (FR-45, EC-6)
+- [ ] Agent access to ticket outside assigned/unassigned queue is denied (FR-44, EC-8)
+- [ ] Unauthenticated write to API returns 401/403 (FR-3, EC-12)
+- [ ] Write API without sufficient role/resource access returns 403/4xx (FR-3)
+- [ ] Concurrent update after ticket moved to Closed is rejected (EC-13)
+
 ## Testing
-- [ ] ...
+- [ ] Integration tests cover all valid status transitions and reject invalid transitions (FR-53, FR-27)
+- [ ] Unit tests cover validation, assignment rules, and role access logic (FR-53)
+- [ ] Edge-case/failure tests cover EC-1 through EC-16 scenarios (FR-53)
+- [ ] CI workflow runs automated tests on push/PR (FR-52)
+
 ## Documentation
-- [ ] ...
+- [ ] OpenAPI/Swagger documentation covers exposed REST/JSON:API endpoints (FR-50, FR-48)
+- [ ] Docker setup instructions allow running the Drupal application locally (FR-51)
+- [ ] Initial Admin bootstrap via manual database setup is documented (FR-10, A-9)
+- [ ] No secrets committed in source; .env / settings.local.php usage documented (NFR-3)
