@@ -148,3 +148,28 @@ deviation was documented — not something the AI flagged on its own.
 
 **Rejected:**
 None.
+
+## July 7, 2026 — Reworded remaining API-response language to Drupal-native terms
+
+**Prompt:**
+Reword leftover API language in requirements-analysis.md (FR-3, FR-17, NFR-4,
+EC-1–EC-16) to Drupal-native terms; terminology only, no behavior changes.
+
+**AI response summary:**
+Updated FR-3, FR-17, NFR-4, and all Edge Cases with 403/4xx/API wording replaced
+by Drupal Form API validation errors, AccessResult::forbidden() / access-denied
+pages, and rendered page output. Also reworded FR-19, FR-27, and FR-45 for
+consistency.
+
+**Accepted:**
+All API-response terminology in requirements-analysis.md replaced with
+Drupal-native equivalents; no rule or behavior changes.
+
+**Changed:**
+Additional leftover API language found beyond the earlier FR-49 fix, caught via a
+full manual pass rather than generated correctly on the first architecture-deviation
+pass.
+
+**Rejected:**
+None.
+

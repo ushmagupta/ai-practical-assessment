@@ -45,7 +45,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 
 - FR-1: Implement login/logout using **Drupal session-based authentication**.
 - FR-2: Protect all Drupal routes via permissions and custom access checks; redirect anonymous users to login.
-- FR-3: Enforce authorization on every write API endpoint—verify role and resource access, not just session validity.
+- FR-3: Enforce authorization on every Form submission handler and route access callback—verify role and resource access, not just session validity.
 - FR-4: Roles: **Admin** (Drupal super admin, one account), **Agent**, **Reporter**. Enforce via Drupal permissions and custom access checks server-side.
 
 ### User Management
@@ -65,9 +65,9 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - FR-14: On create: `status = Open`, `priority = Medium` (if not provided), `assignedTo = null` (unassigned).
 - FR-15: **No automatic assignment.** Tickets remain unassigned until manually assigned by Admin or Agent.
 - FR-16: Only **Admin** and **Agent** may assign or reassign `assignedTo`.
-- FR-17: `assignedTo` must reference a user with the **Agent** role; reject any other value with 4xx and `field: assignedTo`.
+- FR-17: `assignedTo` must reference a user with the **Agent** role; any other value is rejected with a Drupal Form API validation error displayed inline on the `assignedTo` field.
 - FR-18: **Agents may self-assign.**
-- FR-19: **Reporter** must not see or set `assignedTo` in UI or API payloads; backend rejects assignment attempts from Reporter sessions.
+- FR-19: **Reporter** must not see or set `assignedTo` in the UI or in rendered page output; server-side access checks reject assignment attempts from Reporter sessions.
 - FR-20: **Admin** may delete tickets (via Drupal).
 - FR-21: **Reporter** may update their own tickets (title, description, type, priority—fields permitted while ticket is editable; excludes status and assignee).
 - FR-22: **No edits** permitted on **Closed** or **Cancelled** tickets (all roles).
@@ -84,7 +84,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 
 ### Status Lifecycle
 
-- FR-27: Enforce state machine server-side; reject invalid transitions with structured 4xx error regardless of role:
+- FR-27: Enforce state machine server-side; reject invalid transitions with a form-level validation error regardless of role:
 
   | From        | To          |
   |-------------|-------------|
@@ -123,7 +123,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 
 - FR-43: **Admin:** all tickets (including assignee visibility).
 - FR-44: **Agent:** assigned tickets and unassigned tickets only (work queue).
-- FR-45: **Reporter:** own tickets only (created by them); `assignedTo` omitted from views and API responses.
+- FR-45: **Reporter:** own tickets only (created by them); `assignedTo` omitted from rendered views and page output.
 
 ### UI (Drupal)
 
@@ -147,7 +147,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - NFR-1: Server-side validation and authorization are the source of truth; client-side/form validation is UX-only.
 - NFR-2: Never rely on hiding UI elements alone for access control—all rules enforced server-side.
 - NFR-3: No secrets in source code; use `.env` / `settings.local.php` (git-ignored).
-- NFR-4: Clear, user-visible feedback for validation failures (inline form errors), authorization failures (access-denied pages), and invalid state transitions (form-level rejection with explanatory message).
+- NFR-4: Clear validation messages and access-denied handling for field validation failures, authorization failures, and invalid state transitions (form-level rejection with explanatory message).
 - NFR-5: Stack: Drupal 10 monolith — custom module + custom theme (`src/`), MySQL/MariaDB. No separate frontend app.
 
 ## Assumptions
@@ -197,19 +197,19 @@ The following were resolved during requirements gathering:
 
 ## Edge Cases
 
-- EC-1: Reporter submits `assignedTo` in form or API payload → 403/4xx authorization error.
-- EC-2: Admin or Agent assigns ticket to non-Agent user → 4xx validation error on `assignedTo`.
-- EC-3: Invalid status transition (e.g. Open → Closed, Resolved → In Progress) → 4xx with state machine error regardless of role.
-- EC-4: Reporter attempts status change → 403/4xx authorization error.
-- EC-5: Edit or comment on Closed/Cancelled ticket → rejected.
-- EC-6: Reporter attempts to view or comment on another user's ticket → denied.
-- EC-7: Reporter views ticket detail → `assignedTo` field omitted from response.
-- EC-8: Agent requests ticket outside assigned/unassigned queue → denied.
+- EC-1: Reporter submits `assignedTo` in form → access denied (`AccessResult::forbidden()` / access-denied page) or inline form validation error.
+- EC-2: Admin or Agent assigns ticket to non-Agent user → inline Form API validation error on the `assignedTo` field.
+- EC-3: Invalid status transition (e.g. Open → Closed, Resolved → In Progress) → form-level validation error with state machine message regardless of role.
+- EC-4: Reporter attempts status change → access denied (`AccessResult::forbidden()` / access-denied page) or form validation error.
+- EC-5: Edit or comment on Closed/Cancelled ticket → rejected with form validation error or access denied.
+- EC-6: Reporter attempts to view or comment on another user's ticket → access denied (`AccessResult::forbidden()` / access-denied page).
+- EC-7: Reporter views ticket detail → `assignedTo` field omitted from rendered page output.
+- EC-8: Agent requests ticket outside assigned/unassigned queue → access denied (`AccessResult::forbidden()` / access-denied page).
 - EC-9: Admin deletes user who is assignee on open tickets → blocked.
 - EC-10: Admin attempts self-deletion → blocked.
-- EC-11: Field length exceeded (title > 100, description/comment > 1000) → validation error with `field` in error payload.
-- EC-12: User without session calls write endpoint → 401/403.
-- EC-13: Ticket update after concurrent status change to Closed → second write rejected.
-- EC-14: Empty or whitespace-only title/type on create → validation error.
+- EC-11: Field length exceeded (title > 100, description/comment > 1000) → inline form validation error on the offending field.
+- EC-12: Anonymous user submits a protected form or accesses a protected route → login redirect or access-denied page.
+- EC-13: Ticket update after concurrent status change to Closed → second form submission rejected with validation error.
+- EC-14: Empty or whitespace-only title/type on create → inline form validation error.
 - EC-15: Agent self-assigns unassigned ticket → allowed.
 - EC-16: Reporter changes `type` on own ticket → allowed (categorization only; no assignment side effect).
