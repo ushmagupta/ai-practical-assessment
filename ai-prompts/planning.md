@@ -203,3 +203,53 @@ None.
 
 **Rejected:**
 None.
+
+## July 10, 2026 — Created implementation-plan.md
+
+**Prompt:**
+Read all finalized design docs and test-strategy.md as sole source of truth. Fill
+implementation-plan.md keeping existing template headers; turn design into a
+build-and-verify schedule with every build task paired to test-strategy
+verification. Show full content before approval.
+
+**AI response summary:**
+Drafted initial implementation-plan.md (~200 lines): 11 milestones (M0–M10),
+~45 FR/EC-cited build→verify task rows, per-milestone AI table, 10-item risks
+matrix with mitigations.
+
+**Accepted:**
+Initial draft committed as first pass (verbose traceability-matrix style).
+
+**Changed:**
+None in first commit.
+
+**Rejected:**
+None.
+
+## July 10, 2026 — Revised implementation-plan.md
+
+**Prompt:**
+Challenged initial draft: too long and granular — duplicated FR/EC citations and
+architecture rationale already in other docs. Requested 5–6 milestones, grouped
+checklists, 4–5 one-line risks, one-paragraph AI plan, unambiguous logging
+instruction. Resolved empty-state scope: themed empty-state messages in scope;
+custom breadcrumbs out of scope.
+
+**AI response summary:**
+Condensed implementation-plan.md (~100 lines): 6 milestones with one-line goal
+and done-check; task breakdown as named checklists (state machine, assignment,
+role visibility, etc.); build paired with test-strategy verification without
+per-row FR citations; logging split (planning.md vs implementation.md); empty-state
+in, breadcrumbs out.
+
+**Accepted:**
+Revised `implementation-plan.md` approved — ready to begin M1 implementation.
+
+**Changed:**
+Reduced from 11 milestones / ~45 cited rows to 6 milestones / grouped checklists;
+removed duplicate traceability and per-milestone AI table; resolved presentation
+scope (empty-state yes, breadcrumbs no).
+
+**Rejected:**
+Initial verbose format (FR/EC matrix per task, 10-milestone granularity, defer-if-
+time-constrained language for empty-state).
