@@ -25,7 +25,7 @@ earlier drafts of this document that included them. api-contract.md is not
 maintained as a live deliverable for this reason — see that file for a short
 note pointing back here.
 
-## My Understanding (in your own words)
+## My Understanding
 
 This is an internal support ticket system built entirely on Drupal 10 — custom module, custom theme, Form API, Controllers, and Views under `src/`. There is no separate frontend application. Users authenticate via Drupal core session-based auth; anonymous users are redirected to login via route access control.
 
@@ -35,9 +35,9 @@ Tickets are created **unassigned** (`assignedTo = null`). On creation, status de
 
 Tickets include a **`type`** field (e.g. Technical, Billing, Account, General) for categorization and search/filter. This field is an **assumption/addition—not part of the original source brief**—and does **not** drive assignment logic.
 
-Status changes follow a strict server-side state machine. **Resolved** means the fix is verified; **Closed** means archived. Closed and cancelled tickets are read-only—no field edits and no new comments. Comments may be edited by their author only. Admins can delete tickets via Drupal; user deletion is blocked when the user is assigned to any ticket, and an Admin cannot delete themselves.
+Status changes follow a strict server-side state machine. **Resolved** means the fix is verified; **Closed** means archived. Closed and cancelled tickets are read-only detail pages—no field edits, no new comments, and no edits to existing comments; the page remains viewable with write forms disabled. Comments may be edited by their author only while the parent ticket is editable; comment deletion is out of scope. Admins can delete tickets via Drupal; user deletion is blocked when the user is assigned to any ticket, and an Admin cannot delete themselves.
 
-Search supports keyword search, filters (status, priority, assignee, type), sorting, and pagination (page size 5, default sort by `createdAt`). Cancelled tickets are available to Admin via a status filter; closed tickets appear in the default list.
+Search supports keyword search across **title and description**, plus filters (status, priority, assignee, type), sorting, and pagination (page size 5, default sort by `createdAt`). Cancelled tickets are available to Admin via a status filter; closed tickets appear in the default list. Concurrent form submissions are rejected when `field_ticket_status` changed since the form was built (status re-check on submit).
 
 ## Functional Requirements
 
@@ -70,7 +70,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - FR-19: **Reporter** must not see or set `assignedTo` in the UI or in rendered page output; server-side access checks reject assignment attempts from Reporter sessions.
 - FR-20: **Admin** may delete tickets (via Drupal).
 - FR-21: **Reporter** may update their own tickets (title, description, type, priority—fields permitted while ticket is editable; excludes status and assignee).
-- FR-22: **No edits** permitted on **Closed** or **Cancelled** tickets (all roles).
+- FR-22: **No edits** permitted on **Closed** or **Cancelled** tickets (all roles). Terminal tickets remain **viewable** on the detail page; fields, status transitions, and comment forms are read-only or hidden, with server-side write denial on submit.
 - FR-23: Field length limits: `title` ≤ 100 characters; `description` ≤ 1000 characters.
 
 ### Ticket Type (Assumption / Addition)
@@ -105,13 +105,13 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - FR-30: Add comments to tickets.
 - FR-31: **Reporter:** may comment only on their own tickets.
 - FR-32: **Agent / Admin:** may comment on any ticket they can access.
-- FR-33: Any user may **edit their own** comments.
-- FR-34: Comments **not allowed** on **Cancelled** or **Closed** tickets.
+- FR-33: Any user may **edit their own** comments while the parent ticket is **not** Closed or Cancelled.
+- FR-34: Comments **not allowed** on **Cancelled** or **Closed** tickets (no new comments; no edits to existing comments).
 - FR-35: Comment `message` ≤ 1000 characters.
 
 ### Search, Filter, Sort & Pagination
 
-- FR-36: Keyword search across tickets.
+- FR-36: Keyword search across tickets, matching against **title and description**.
 - FR-37: Filters: status, priority, assignee, type.
 - FR-38: **Admin** list: show all tickets; include **Cancelled** as a status filter option (cancelled tickets surfaced via filter).
 - FR-39: **Closed** tickets appear in the default list.
@@ -148,6 +148,7 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - NFR-2: Never rely on hiding UI elements alone for access control—all rules enforced server-side.
 - NFR-3: No secrets in source code; use `.env` / `settings.local.php` (git-ignored).
 - NFR-4: Clear validation messages and access-denied handling for field validation failures, authorization failures, and invalid state transitions (form-level rejection with explanatory message).
+- NFR-6: On ticket update, transition, and comment forms, **re-check `field_ticket_status` from storage on submit**; if the ticket became Closed or Cancelled (or the status changed) since the form was built, reject the submission with a form-level validation error. Drupal form tokens provide CSRF protection; status re-check handles concurrent modification (ISS-4, EC-13).
 - NFR-5: Stack: Drupal 10 monolith — custom module + custom theme (`src/`), MySQL/MariaDB. No separate frontend app.
 
 ## Assumptions
@@ -157,13 +158,17 @@ Search supports keyword search, filters (status, priority, assignee, type), sort
 - A-3: "Unassigned" means `assignedTo` is null; ticket remains unassigned until Admin or Agent assigns it.
 - A-4: Agent queue and transition scope = tickets assigned to that Agent plus all unassigned tickets (global unassigned pool). Agent may **not** perform status transitions on tickets assigned to a different Agent.
 - A-5: Default sort direction for `createdAt` is descending (newest first).
-- A-6: Comment edit applies to `message` only; no comment deletion unless implied by edit-only scope.
+- A-6: Comment edit applies to `message` only; **comment deletion is out of scope** (C-2 resolved).
 - A-7: Admin cancelled-ticket visibility: all non-cancelled tickets shown by default; Admin uses status filter to include/view cancelled tickets.
 - A-8: Reporter "update own ticket" excludes status and assignee; applies only while ticket is not Closed or Cancelled. Changing `type` does not trigger reassignment.
 - A-9: The single Admin maps to Drupal's built-in super-administrator (uid 1 or equivalent).
 - A-10: Drupal-only monolith — no decoupled SPA; session auth via Drupal core.
 - A-11: **Addition—not cited from original source brief:** Admin-only ticket deletion (FR-11, FR-20). Core features cover create/list/view/update/comment/status/search only — delete is not included.
 - A-12: **Addition—not cited from original source brief:** User deletion blocking rules (FR-8: cannot delete a user who is assignee on any ticket; FR-9: Admin cannot self-delete). Not specified in the source brief.
+- A-13: **Resolved (C-2):** Comment deletion is out of scope. Authors may edit their own comment `message` only; no role may delete comments.
+- A-14: **Resolved (ISS-6):** Keyword search matches ticket **title and description** (not status, priority, assignee, or type labels).
+- A-15: **Resolved (ISS-8):** Closed and Cancelled tickets use a **read-only detail page** (view allowed; write forms disabled or omitted). Server-side access checks and form validation reject any write attempt—not a blanket 403 on the detail route.
+- A-16: **Resolved (ISS-4):** Concurrent modification is detected by reloading `field_ticket_status` on form submit and comparing to the value at form build; mismatches or terminal status produce a form-level validation error (see NFR-6, EC-13).
 
 ## Clarifications (questions for a product owner)
 
@@ -179,21 +184,20 @@ The following were resolved during requirements gathering:
 | Assignee rules | Agent-role users only; Admin/Agent assign; self-assign allowed; nullable on create |
 | Reporter assignee access | Cannot see or set `assignedTo`; backend rejects assignment attempts |
 | Ticket deletion | Admin only |
-| Closed/Cancelled edits | No field edits; no new comments |
-| Comment edits | Author may edit own comment |
+| Closed/Cancelled edits | No field edits; no new comments; no comment edits (ISS-5) |
+| Comment edits | Author may edit own comment while ticket is editable; deletion out of scope (C-2) |
+| Keyword search scope | Title and description (ISS-6) |
+| Terminal ticket UX | Detail page viewable; read-only forms; server denies writes (ISS-8) |
+| Concurrent modification | Form token (CSRF) + status re-check on submit (ISS-4, NFR-6) |
 | Agent status transitions | Assigned to self + global unassigned queue only; not tickets assigned to another Agent |
 | Visibility | Admin: all; Agent: assigned + unassigned queue; Reporter: own only |
 | Cancelled visibility | Admin filter dropdown; closed in default list |
 | Pagination / sort | Page size 5; default sort `createdAt`; sort by createdAt, updatedAt, priority, status |
 | User deletion | Blocked if user assigned to any ticket; Admin cannot self-delete |
 | Architecture | Drupal-only monolith (module + theme); no React/Vite SPA |
-| API style | REST and JSON:API (from Drupal) |
+| API / integrations | No exposed API layer; server-rendered Drupal monolith only (architecture deviation; ISS-2) |
 | Bootstrap Admin | Manual DB |
 | Roles | One Admin (super admin) + Agent + Reporter sub-roles |
-
-**Open items for confirmation during implementation:**
-
-- C-2: Comment deletion—edit-only confirmed; is delete out of scope?
 
 ## Edge Cases
 
@@ -201,7 +205,7 @@ The following were resolved during requirements gathering:
 - EC-2: Admin or Agent assigns ticket to non-Agent user → inline Form API validation error on the `assignedTo` field.
 - EC-3: Invalid status transition (e.g. Open → Closed, Resolved → In Progress) → form-level validation error with state machine message regardless of role.
 - EC-4: Reporter attempts status change → access denied (`AccessResult::forbidden()` / access-denied page) or form validation error.
-- EC-5: Edit or comment on Closed/Cancelled ticket → rejected with form validation error or access denied.
+- EC-5: Edit ticket fields, add a comment, or edit an existing comment on a Closed/Cancelled ticket → rejected with form validation error or access denied (ISS-5, ISS-8).
 - EC-6: Reporter attempts to view or comment on another user's ticket → access denied (`AccessResult::forbidden()` / access-denied page).
 - EC-7: Reporter views ticket detail → `assignedTo` field omitted from rendered page output.
 - EC-8: Agent requests ticket outside assigned/unassigned queue → access denied (`AccessResult::forbidden()` / access-denied page).
@@ -209,7 +213,7 @@ The following were resolved during requirements gathering:
 - EC-10: Admin attempts self-deletion → blocked.
 - EC-11: Field length exceeded (title > 100, description/comment > 1000) → inline form validation error on the offending field.
 - EC-12: Anonymous user submits a protected form or accesses a protected route → login redirect or access-denied page.
-- EC-13: Ticket update after concurrent status change to Closed → second form submission rejected with validation error.
+- EC-13: Ticket update or transition after concurrent status change (e.g. another session moved ticket to Closed) → second form submission rejected with form-level validation error after status re-check on submit (ISS-4, NFR-6).
 - EC-14: Empty or whitespace-only title/type on create → inline form validation error.
 - EC-15: Agent self-assigns unassigned ticket → allowed.
 - EC-16: Reporter changes `type` on own ticket → allowed (categorization only; no assignment side effect).

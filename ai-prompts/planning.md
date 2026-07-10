@@ -173,3 +173,55 @@ pass.
 **Rejected:**
 None.
 
+## July 10, 2026 — Resolved open design items C-2 and ISS-4 through ISS-8
+
+**Prompt:**
+Implement the resolve-open to-do: close C-2 and ISS-4 through ISS-8 before
+implementation; fix stale API wording (ISS-1, ISS-2). Do not edit the plan file.
+
+**AI response summary:**
+Resolved all pre-implementation open items in requirements-analysis.md and
+acceptance-criteria.md:
+
+- **C-2:** Comment deletion out of scope; author edit-only (A-13).
+- **ISS-4:** Concurrent modification via Drupal form token + `field_ticket_status`
+  re-check on submit (NFR-6, EC-13).
+- **ISS-5:** No comment edits on Closed/Cancelled tickets (FR-33, FR-34).
+- **ISS-6:** Keyword search matches title and description (FR-36, A-14).
+- **ISS-8:** Terminal tickets viewable read-only; server denies writes (FR-22,
+  A-15).
+- **ISS-1:** acceptance-criteria.md — "API responses" → "rendered page output".
+- **ISS-2:** Clarifications table — API row updated to architecture deviation.
+
+Removed the "Open items for confirmation" section from requirements-analysis.md.
+
+**Accepted:**
+All open items closed with documented decisions before implementation phase.
+
+**Changed:**
+None.
+
+**Rejected:**
+None.
+
+## July 10, 2026 — Approved data-model.md
+
+**Prompt:**
+Started the design phase from the Support Ticket Design Plan (architecture decided,
+four design docs in order). Assigned the `data-model` to-do: write `data-model.md`
+first.
+
+**AI response summary:**
+Drafted `data-model.md`: User/Ticket/Comment mapped to Drupal core (`node` bundle
+`ticket`, core comments). Documented fields, enums, relationships, validation, and
+status transitions per requirements-analysis.md.
+
+**Accepted:**
+`data-model.md` approved — baseline for remaining design docs and implementation.
+
+**Changed:**
+Reviewed the draft and asked Cursor to correct colliding field names
+(`field_type`, `field_status`) that clash with Node base fields. Approved the
+revised draft.
+Renamed `field_type` → `field_ticket_type` and `field_status` →
+`field_ticket_status` throughout `data-model.md` and `requirements-analysis.md`.
