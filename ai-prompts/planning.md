@@ -203,25 +203,3 @@ None.
 
 **Rejected:**
 None.
-
-## July 10, 2026 — Approved data-model.md
-
-**Prompt:**
-Started the design phase from the Support Ticket Design Plan (architecture decided,
-four design docs in order). Assigned the `data-model` to-do: write `data-model.md`
-first.
-
-**AI response summary:**
-Drafted `data-model.md`: User/Ticket/Comment mapped to Drupal core (`node` bundle
-`ticket`, core comments). Documented fields, enums, relationships, validation, and
-status transitions per requirements-analysis.md.
-
-**Accepted:**
-`data-model.md` approved — baseline for remaining design docs and implementation.
-
-**Changed:**
-Reviewed the draft and asked Cursor to correct colliding field names
-(`field_type`, `field_status`) that clash with Node base fields. Approved the
-revised draft.
-Renamed `field_type` → `field_ticket_type` and `field_status` →
-`field_ticket_status` throughout `data-model.md` and `requirements-analysis.md`.
