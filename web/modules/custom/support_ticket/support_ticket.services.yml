@@ -1,0 +1,6 @@
+services:
+  support_ticket.status:
+    class: Drupal\support_ticket\TicketStatusService
+  support_ticket.access:
+    class: Drupal\support_ticket\TicketAccessService
+    arguments: ['@support_ticket.status', '@entity_type.manager']

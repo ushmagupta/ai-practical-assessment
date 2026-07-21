@@ -4,3 +4,56 @@
  * @file
  * Primary module hooks for the Support Ticket module.
  */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function support_ticket_entity_base_field_info_alter(array &$fields, EntityTypeInterface $entity_type): void {
+  if ($entity_type->id() === 'node') {
+    $fields['title']->addConstraint('TicketTitleLength', ['max' => 100]);
+  }
+}
+
+/**
+ * Implements hook_entity_bundle_field_info_alter().
+ */
+function support_ticket_entity_bundle_field_info_alter(array &$fields, EntityTypeInterface $entity_type, string $bundle): void {
+  if ($entity_type->id() === 'node' && $bundle === 'ticket') {
+    $fields['field_description']->addConstraint('TicketDescriptionLength', ['max' => 1000]);
+    $fields['field_assigned_to']->addConstraint('TicketAssigneeIsAgent');
+  }
+  if ($entity_type->id() === 'comment' && $bundle === 'comment') {
+    $fields['comment_body']->addConstraint('CommentMessageLength', ['max' => 1000]);
+  }
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function support_ticket_entity_type_alter(array &$entity_types): void {
+  $entity_types['node']->addConstraint('TicketNotTerminal', ['bundles' => ['ticket']]);
+  if (isset($entity_types['comment'])) {
+    $entity_types['comment']->addConstraint('TicketNotTerminal');
+  }
+  $entity_types['node']->addConstraint('TicketStatusTransition');
+}
+
+/**
+ * Implements hook_user_predelete().
+ */
+function support_ticket_user_predelete(UserInterface $account): void {
+  $access = \Drupal::service('support_ticket.access');
+  $actor = \Drupal::currentUser();
+  if (!$access->userDeletionAllowed($account, $actor)) {
+    if ($actor->id() === $account->id()) {
+      throw new EntityStorageException('Administrators cannot delete their own account.');
+    }
+    throw new EntityStorageException('User cannot be deleted while assigned to one or more tickets.');
+  }
+}

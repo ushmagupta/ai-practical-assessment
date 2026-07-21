@@ -103,3 +103,63 @@ import or module reinstall.
 Prior M1b assumption that `field.field.*` config alone is sufficient for form
 rendering — corrected after manual review (fields showed as disabled in Manage
 form display).
+
+## July 21, 2026 — M2 TicketStatusService + Kernel tests
+
+**Prompt:**
+Implement M2: TicketStatusService + P0 Kernel tests (transitions, terminal,
+Agent scope).
+
+**AI response summary:**
+Added `TicketStatusService` with transition map, terminal-state checks,
+role-scoped transition permission (Admin any; Agent assigned-to-self or
+unassigned; Reporter none), workflow status reader (`field_ticket_status`), and
+stale-status detection for concurrent submits. Registered service as
+`support_ticket.status` in `support_ticket.services.yml`. Added
+`TicketStatusServiceTest` with 19 Kernel assertions covering allowed/rejected
+transitions, terminal states, Admin/Agent/Reporter scope, stale status, and
+workflow vs publish status disambiguation. All Kernel tests pass via
+`lando phpunit`.
+
+**Accepted:**
+M2 TicketStatusService P0 Kernel coverage per test-strategy.md.
+
+**Changed:**
+`web/modules/custom/support_ticket/src/TicketStatusService.php`,
+`web/modules/custom/support_ticket/support_ticket.services.yml`,
+`web/modules/custom/support_ticket/tests/src/Kernel/TicketStatusServiceTest.php`,
+`ai-prompts/implementation.md`.
+
+**Rejected:**
+None.
+
+## July 21, 2026 — M2 complete (access, constraints, delete guards)
+
+**Prompt:**
+Finish M2.
+
+**AI response summary:**
+Completed remaining M2 domain layer: `TicketAccessService` (view/update/delete/assign/comment
+per role and terminal state; user delete guards FR-8/FR-9), six validation constraints
+(`TicketTitleLength`, `TicketDescriptionLength`, `CommentMessageLength`,
+`TicketAssigneeIsAgent`, `TicketStatusTransition`, `TicketNotTerminal`) wired via
+`hook_entity_base_field_info_alter`, `hook_entity_bundle_field_info_alter`, and
+`hook_entity_type_alter`, plus `hook_user_predelete`. Added
+`SupportTicketKernelTestBase`, `TicketAccessServiceTest`, `TicketConstraintTest`, and
+`UserDeleteGuardTest`. Refactored `TicketStatusServiceTest` to extend shared base.
+Full Kernel suite: 35 tests, 422 assertions (`lando phpunit`).
+
+**Accepted:**
+M2 domain rules in isolation — all P0 Kernel tests for services, constraints, and delete
+guards pass.
+
+**Changed:**
+`web/modules/custom/support_ticket/src/TicketAccessService.php`,
+`web/modules/custom/support_ticket/src/Plugin/Validation/Constraint/*`,
+`web/modules/custom/support_ticket/support_ticket.services.yml`,
+`web/modules/custom/support_ticket/support_ticket.module`,
+`web/modules/custom/support_ticket/tests/src/Kernel/*`,
+`ai-prompts/implementation.md`, `implementation-plan.md`.
+
+**Rejected:**
+None.

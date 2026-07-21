@@ -1,0 +1,85 @@
+---
+description: Drupal project development standards and conventions
+alwaysApply: true
+---
+
+# Drupal Development Rules
+
+## Project shape
+
+- Drupal **10** monolith — server-rendered UI (Form API, Views, Twig).
+- Custom code under **`web/modules/custom/`** and **`web/themes/custom/`**.
+- Config-as-code in module **`config/install/`** — no manual admin setup for structural changes.
+- Business logic in the **module**; presentation in the **theme** only.
+
+## General
+
+- Think before generating code.
+- Prefer modifying existing code over duplicate implementations.
+- Follow Drupal 10 coding standards.
+- Production-ready code only — no placeholder logic.
+- Keep functions small and focused.
+- Smallest correct change; match existing patterns in the repo.
+
+## Architecture
+
+- Use dependency injection; register services in `*.services.yml`.
+- Business logic in services; hooks, controllers, and forms stay thin.
+- Avoid `\Drupal::service()` in new classes (acceptable in thin `.module` hooks only).
+- Prefer services over procedural code.
+- Use core entities and Field API — no custom database tables unless approved.
+- Server-side validation and access are authoritative; UI visibility is supplementary only.
+
+## PHP
+
+- `declare(strict_types=1);` on new files.
+- PSR-4 namespaces under `Drupal\{module}\`.
+- Inject dependencies via constructor; use `create()` on forms and controllers.
+- Use the Entity API for load, save, and validate.
+- User-facing errors via Form API and Drupal access responses.
+
+## Services
+
+- Extract reusable or non-trivial logic into services.
+- Never instantiate services manually.
+
+## Twig & theme
+
+- Templates are presentation-only — no business logic.
+- Use preprocess functions when shaping data for templates.
+- Escape output properly.
+
+## CSS
+
+- No inline styles.
+- Keep styles modular; use consistent naming (e.g. BEM if using a preprocessor).
+
+## Configuration
+
+- Never hardcode URLs or entity IDs.
+- Ship structural config in `config/install/` with correct dependency order.
+- Verify module enable on a clean database after config changes.
+
+## Security
+
+- Sanitize input; escape output; check permissions on every write path.
+- Use CSRF protection on forms.
+- Never trust request parameters or hidden fields alone.
+- No secrets in code or version control.
+
+## Performance
+
+- Use cache metadata on render arrays.
+- Avoid repeated entity loads and queries inside loops.
+
+## Testing
+
+- Kernel tests for services, constraints, and access logic.
+- Functional tests for user-facing flows.
+- Add tests when behavior changes; cover edge cases and failure paths.
+
+## Workflow
+
+- Work incrementally; confirm scope when requirements are unclear.
+- Do not commit unless asked.
+- Before finishing: standards met, no duplicated logic, security considered, tests updated if needed.

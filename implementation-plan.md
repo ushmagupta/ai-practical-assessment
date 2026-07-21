@@ -27,15 +27,16 @@ Grouped checklist — each area built and verified per test-strategy (Kernel, Fu
 - [x] README: local run, secrets handling, Admin bootstrap
 
 ### Config-as-code
-- [ ] Ticket bundle, fields, roles, permissions
-- [ ] Comment type on tickets
-- [ ] Tickets View at `/tickets` (columns, filters, sort, pagination)
-- [ ] Menu links (Tickets, People)
+- [x] Ticket bundle, fields, roles, permissions
+- [x] Comment type on tickets
+- [x] Tickets View at `/tickets` (columns, filters, sort, pagination)
+- [x] Menu links (Tickets, People)
+- [x] Entity form/view display for ticket bundle (fields visible on create/edit/detail)
 
 ### Domain services & constraints
-- [ ] `TicketStatusService` (transitions, terminal states, role scope, stale-status check) → Kernel
-- [ ] `TicketAccessService` (view/update/delete/assign/comment, queue scope) → Kernel
-- [ ] Six validation constraints + user delete guards → Kernel
+- [x] `TicketStatusService` (transitions, terminal states, role scope, stale-status check) → Kernel
+- [x] `TicketAccessService` (view/update/delete/assign/comment, queue scope) → Kernel
+- [x] Six validation constraints + user delete guards → Kernel
 
 ### Access & forms integration
 - [ ] Node access hooks and route callbacks → Kernel + Functional
@@ -69,9 +70,10 @@ Grouped checklist — each area built and verified per test-strategy (Kernel, Fu
 
 | # | Goal | Done when |
 |---|------|-----------|
-| **M1a** | Runnable scaffold | Lando/README work; module + theme enable; Kernel smoke test passes; CI green |
-| **M1b** | Data model installed via config-as-code | Module enable installs config; `/tickets` loads |
-| **M2** | Domain rules correct in isolation | All P0 Kernel tests pass (services, constraints, delete guards) |
+| **M1a** ✅ | Runnable scaffold | Lando/README work; module + theme enable; Kernel smoke test passes; CI green |
+| **M1b** ✅ | Data model installed via config-as-code | Module enable installs config; `/tickets` loads; form/view displays place fields on ticket screens |
+| **M1** ✅ | Foundation complete (M1a + M1b) | July 2026 — CI green; clean module enable verified |
+| **M2** ✅ | Domain rules correct in isolation | All P0 Kernel tests pass (services, constraints, delete guards) |
 | **M3** | Drupal wired to domain rules | Access hooks, transition form, form alters, View alter in place; P0 Functional paths pass |
 | **M4** | End-to-end ticket, comment, user, and list flows | P1 + representative P2 Functional tests pass |
 | **M5** | Screens match ui-flow presentation | Theme, local tasks, empty-state copy in place; Reporter assignee absent from output |
