@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+name: Ticket
+type: ticket
+description: 'Support ticket for tracking issues and requests.'
+help: null
+new_revision: false
+preview_mode: 0
+display_submitted: true

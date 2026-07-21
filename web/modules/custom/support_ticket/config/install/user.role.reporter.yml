@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.ticket
+  module:
+    - comment
+    - node
+id: reporter
+label: Reporter
+weight: 4
+is_admin: false
+permissions:
+  - 'access comments'
+  - 'access content'
+  - 'create ticket content'
+  - 'edit own comments'
+  - 'edit own ticket content'
+  - 'post comments'
+  - 'skip comment approval'

@@ -3,3 +3,12 @@ type: module
 description: 'Support Ticket Management System domain module.'
 core_version_requirement: ^10
 package: 'Support Ticket'
+dependencies:
+  - drupal:node
+  - drupal:field
+  - drupal:comment
+  - drupal:user
+  - drupal:views
+  - drupal:text
+  - drupal:options
+  - drupal:path

@@ -1,0 +1,13 @@
+support_ticket.tickets:
+  title: Tickets
+  route_name: view.tickets.page_1
+  menu_name: main
+  weight: 0
+
+support_ticket.people:
+  title: People
+  route_name: entity.user.collection
+  menu_name: main
+  weight: 10
+  requirements:
+    _permission: 'administer users'

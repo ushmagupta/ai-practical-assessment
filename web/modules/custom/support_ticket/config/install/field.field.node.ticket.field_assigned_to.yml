@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_assigned_to
+    - node.type.ticket
+id: node.ticket.field_assigned_to
+field_name: field_assigned_to
+entity_type: node
+bundle: ticket
+label: 'Assigned to'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: _none
+    sort:
+      field: name
+      direction: ASC
+    auto_create: false
+field_type: entity_reference
