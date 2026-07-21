@@ -73,4 +73,4 @@ jobs:
           vendor/bin/drush --root=web config:set system.theme default support_ticket_theme -y
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit -c phpunit.xml
+        run: vendor/bin/phpunit -c "${{ github.workspace }}/phpunit.xml"
