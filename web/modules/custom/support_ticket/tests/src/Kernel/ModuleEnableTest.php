@@ -83,6 +83,20 @@ class ModuleEnableTest extends KernelTestBase {
       ->load('tickets');
     $this->assertNotNull($view);
     $this->assertTrue($view->status());
+
+    $form_display = $this->container->get('entity_type.manager')
+      ->getStorage('entity_form_display')
+      ->load('node.ticket.default');
+    $this->assertNotNull($form_display);
+    $this->assertArrayHasKey('field_ticket_type', $form_display->getComponents());
+    $this->assertArrayHasKey('field_description', $form_display->getComponents());
+    $this->assertArrayHasKey('field_ticket_status', $form_display->get('hidden'));
+
+    $view_display = $this->container->get('entity_type.manager')
+      ->getStorage('entity_view_display')
+      ->load('node.ticket.default');
+    $this->assertNotNull($view_display);
+    $this->assertArrayHasKey('field_ticket_status', $view_display->getComponents());
   }
 
 }

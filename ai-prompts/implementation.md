@@ -73,3 +73,33 @@ tests/src/Kernel/ModuleEnableTest.php).
 
 **Rejected:**
 None.
+
+## July 21, 2026 — M1b correction: ticket form/view display config
+
+**Prompt:**
+Fix disabled ticket fields on the create/edit form (fields existed but were not
+placed on the form display). Log the correction in implementation.md to record
+that the prior AI-generated M1b output was incomplete.
+
+**AI response summary:**
+M1b shipped field storage and field instances only; Drupal also requires
+`core.entity_form_display` and `core.entity_view_display` config to render
+custom fields on node forms and detail pages. Added
+`core.entity_form_display.node.ticket.default.yml` (title, type, description,
+priority, assignee visible; workflow status and publish options hidden) and
+`core.entity_view_display.node.ticket.default.yml`. Extended `ModuleEnableTest`
+to assert both displays install with expected components.
+
+**Accepted:**
+Ticket fields visible on `/node/add/ticket` and ticket detail after config
+import or module reinstall.
+
+**Changed:**
+`web/modules/custom/support_ticket/config/install/core.entity_form_display.node.ticket.default.yml`,
+`web/modules/custom/support_ticket/config/install/core.entity_view_display.node.ticket.default.yml`,
+`web/modules/custom/support_ticket/tests/src/Kernel/ModuleEnableTest.php`.
+
+**Rejected:**
+Prior M1b assumption that `field.field.*` config alone is sufficient for form
+rendering — corrected after manual review (fields showed as disabled in Manage
+form display).

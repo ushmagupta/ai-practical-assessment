@@ -1,0 +1,70 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.ticket.field_assigned_to
+    - field.field.node.ticket.field_description
+    - field.field.node.ticket.field_priority
+    - field.field.node.ticket.field_ticket_status
+    - field.field.node.ticket.field_ticket_type
+    - node.type.ticket
+  module:
+    - options
+    - path
+    - text
+id: node.ticket.default
+targetEntityType: node
+bundle: ticket
+mode: default
+content:
+  field_assigned_to:
+    type: entity_reference_autocomplete
+    weight: 4
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_description:
+    type: text_textarea
+    weight: 2
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_priority:
+    type: options_select
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_ticket_type:
+    type: options_select
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 30
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  field_ticket_status: true
+  promote: true
+  status: true
+  sticky: true
+  uid: true
