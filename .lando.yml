@@ -1,0 +1,24 @@
+name: support-ticket
+recipe: drupal10
+config:
+  webroot: web
+  php: '8.3'
+  database: mariadb:11.4
+  via: apache
+tooling:
+  composer:
+    service: appserver
+    dir: /app
+  drush:
+    service: appserver
+    cmd: drush
+    dir: /app/web
+  phpunit:
+    service: appserver
+    description: Run PHPUnit tests
+    cmd: /app/vendor/bin/phpunit -c /app/phpunit.xml
+  site-install:
+    service: appserver
+    description: Install Drupal with the standard profile
+    cmd: drush site:install standard --db-url=mysql://drupal10:drupal10@database/drupal10 --account-name=admin --account-pass=admin -y
+    dir: /app/web

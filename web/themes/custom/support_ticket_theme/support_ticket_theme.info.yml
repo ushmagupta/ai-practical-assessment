@@ -1,0 +1,8 @@
+name: 'Support Ticket Theme'
+type: theme
+description: 'Custom theme for the Support Ticket Management System.'
+core_version_requirement: ^10
+base theme: olivero
+
+libraries:
+  - support_ticket_theme/global-styling

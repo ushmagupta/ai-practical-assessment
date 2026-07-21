@@ -6,7 +6,7 @@ on, searching, and progressing support tickets through a status lifecycle, with
 authentication, role-based access, and full user management.
 
 ## Stack
-- Application: Drupal 10 — custom module, custom theme, Form API, Controllers, Views — src/
+- Application: Drupal 10 — custom module, custom theme, Form API, Controllers, Views — web/
 - Database: MySQL/MariaDB
 - UI: Drupal-rendered pages (Twig templates, Forms, Views) — no separate frontend app
 

@@ -14,17 +14,17 @@ Build-and-verify schedule for the Support Ticket System. Design and test scope: 
 
 ## Overview
 
-Drupal 10 monolith under `src/`: `support_ticket` module, `support_ticket_theme`, config-as-code install, `TicketStatusService` + `TicketAccessService`, server-rendered screens per ui-flow. Kernel tests prove services and constraints; Functional tests prove role flows, listing, and terminal read-only behavior. CI runs PHPUnit on push/PR once Kernel tests exist.
+Drupal 10 monolith at repo root (`web/` docroot): `support_ticket` module, `support_ticket_theme`, config-as-code install, `TicketStatusService` + `TicketAccessService`, server-rendered screens per ui-flow. Kernel tests prove services and constraints; Functional tests prove role flows, listing, and terminal read-only behavior. CI runs PHPUnit on push/PR.
 
 ## Task Breakdown
 
 Grouped checklist — each area built and verified per test-strategy (Kernel, Functional, or smoke as noted there).
 
 ### Scaffold & environment
-- [ ] Docker + Drupal 10 app skeleton
-- [ ] Module and theme skeletons
-- [ ] CI workflow running PHPUnit
-- [ ] README: local run, secrets handling, Admin bootstrap
+- [x] Lando + Drupal 10 app skeleton (Composer recommended-project at repo root)
+- [x] Module and theme skeletons
+- [x] CI workflow running PHPUnit
+- [x] README: local run, secrets handling, Admin bootstrap
 
 ### Config-as-code
 - [ ] Ticket bundle, fields, roles, permissions
@@ -69,7 +69,8 @@ Grouped checklist — each area built and verified per test-strategy (Kernel, Fu
 
 | # | Goal | Done when |
 |---|------|-----------|
-| **M1** | Runnable scaffold with data model installed | Docker/README work; module enable installs config; `/tickets` loads |
+| **M1a** | Runnable scaffold | Lando/README work; module + theme enable; Kernel smoke test passes; CI green |
+| **M1b** | Data model installed via config-as-code | Module enable installs config; `/tickets` loads |
 | **M2** | Domain rules correct in isolation | All P0 Kernel tests pass (services, constraints, delete guards) |
 | **M3** | Drupal wired to domain rules | Access hooks, transition form, form alters, View alter in place; P0 Functional paths pass |
 | **M4** | End-to-end ticket, comment, user, and list flows | P1 + representative P2 Functional tests pass |

@@ -1,0 +1,5 @@
+name: 'Support Ticket'
+type: module
+description: 'Support Ticket Management System domain module.'
+core_version_requirement: ^10
+package: 'Support Ticket'
