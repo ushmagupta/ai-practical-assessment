@@ -1,0 +1,14 @@
+support_ticket.ticket_transition:
+  path: '/ticket/{node}/transition'
+  defaults:
+    _form: '\Drupal\support_ticket\Form\TicketTransitionForm'
+    _title: 'Change status'
+  requirements:
+    _custom_access: 'support_ticket.ticket_transition_access::access'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: entity:node
+        bundle:
+          - ticket

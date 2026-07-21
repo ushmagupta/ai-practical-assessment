@@ -4,3 +4,10 @@ services:
   support_ticket.access:
     class: Drupal\support_ticket\TicketAccessService
     arguments: ['@support_ticket.status', '@entity_type.manager']
+  support_ticket.ticket_transition_access:
+    class: Drupal\support_ticket\Access\TicketTransitionAccess
+    arguments: ['@support_ticket.status']
+  support_ticket.route_subscriber:
+    class: Drupal\support_ticket\EventSubscriber\TicketsRouteSubscriber
+    tags:
+      - { name: event_subscriber }

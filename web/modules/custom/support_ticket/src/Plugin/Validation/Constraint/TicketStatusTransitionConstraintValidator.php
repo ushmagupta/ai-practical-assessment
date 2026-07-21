@@ -39,14 +39,14 @@ class TicketStatusTransitionConstraintValidator extends ConstraintValidator impl
     if (!$constraint instanceof TicketStatusTransitionConstraint) {
       return;
     }
-    if (!$entity instanceof NodeInterface || $entity->bundle() !== 'ticket') {
+    if (!$entity instanceof NodeInterface || !in_array($entity->bundle(), $constraint->bundles, TRUE)) {
       return;
     }
     if ($entity->isNew()) {
       return;
     }
     $original = $entity->original;
-    if (!$original instanceof NodeInterface && !$entity->isNew()) {
+    if (!$original instanceof NodeInterface) {
       $original = $this->entityTypeManager->getStorage('node')->loadUnchanged($entity->id());
     }
     if (!$original instanceof NodeInterface) {

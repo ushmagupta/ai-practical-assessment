@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\support_ticket;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Workflow status transitions and terminal-state rules for ticket nodes.
@@ -109,7 +109,7 @@ class TicketStatusService {
   /**
    * Determines whether a user may transition a ticket to a target status.
    */
-  public function canTransition(UserInterface $user, NodeInterface $ticket, string $to_status): bool {
+  public function canTransition(AccountInterface $account, NodeInterface $ticket, string $to_status): bool {
     $from_status = $this->getTicketStatus($ticket);
     if ($from_status === NULL) {
       return FALSE;
@@ -117,25 +117,26 @@ class TicketStatusService {
     if (!$this->isValidTransition($from_status, $to_status)) {
       return FALSE;
     }
-    return $this->canUserTransitionTicket($user, $ticket);
+    return $this->canUserTransitionTicket($account, $ticket);
   }
 
   /**
    * Determines whether a user may perform any transition on a ticket.
    */
-  public function canUserTransitionTicket(UserInterface $user, NodeInterface $ticket): bool {
+  public function canUserTransitionTicket(AccountInterface $account, NodeInterface $ticket): bool {
     $current_status = $this->getTicketStatus($ticket);
     if ($current_status === NULL || $this->isTerminal($current_status)) {
       return FALSE;
     }
-    if ($user->hasRole('administrator')) {
+    if ($account->hasRole('administrator')) {
       return TRUE;
     }
-    if ($user->hasRole('reporter')) {
+    if ($account->hasRole('reporter')) {
       return FALSE;
     }
-    if ($user->hasRole('agent')) {
-      return $this->isAgentScopedTicket($user, $ticket);
+    if ($account->hasRole('agent')) {
+      return $account->hasPermission('transition scoped tickets')
+        && TicketScopeHelper::isAgentScopedTicket($account, $ticket);
     }
     return FALSE;
   }
@@ -155,16 +156,6 @@ class TicketStatusService {
       return TRUE;
     }
     return $this->isTerminal($current_status);
-  }
-
-  /**
-   * Whether an Agent may act on a ticket (assigned to self or unassigned).
-   */
-  protected function isAgentScopedTicket(UserInterface $agent, NodeInterface $ticket): bool {
-    if (!$ticket->hasField('field_assigned_to') || $ticket->get('field_assigned_to')->isEmpty()) {
-      return TRUE;
-    }
-    return (int) $ticket->get('field_assigned_to')->target_id === (int) $agent->id();
   }
 
 }

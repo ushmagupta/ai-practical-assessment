@@ -95,9 +95,7 @@ Ticket fields visible on `/node/add/ticket` and ticket detail after config
 import or module reinstall.
 
 **Changed:**
-`web/modules/custom/support_ticket/config/install/core.entity_form_display.node.ticket.default.yml`,
-`web/modules/custom/support_ticket/config/install/core.entity_view_display.node.ticket.default.yml`,
-`web/modules/custom/support_ticket/tests/src/Kernel/ModuleEnableTest.php`.
+
 
 **Rejected:**
 Prior M1b assumption that `field.field.*` config alone is sufficient for form
@@ -163,3 +161,69 @@ guards pass.
 
 **Rejected:**
 None.
+
+## July 22, 2026 — M3 Drupal integration (access refactor + hooks)
+
+**Prompt:**
+Refactor access layer (AccountInterface, shared agent scope, list helper) and start M3:
+hook_node_access, transition form, form alters, Views query alter.
+
+**AI response summary:**
+Extracted `TicketScopeHelper` for shared Agent queue scoping; refactored
+`TicketAccessService` and `TicketStatusService` to use `AccountInterface`.
+Added `applyListScope()` and `applyListScopeToViewsQuery()` list helpers.
+Wired `hook_node_access`, `hook_entity_access` (comments), `hook_views_query_alter`,
+node/comment form alters, create defaults via `hook_entity_presave`, Reporter
+assignee hiding via `hook_node_view`, local task visibility, and anonymous login
+requirement on `/tickets` via `TicketsRouteSubscriber`. Added transition form at
+`/ticket/{node}/transition` with `TicketTransitionForm` and access check.
+Added `TicketListScopeTest` Kernel coverage. Full Kernel suite: 38 tests, 453
+assertions (`lando phpunit`).
+
+**Accepted:**
+M3 integration foundation — services wired to Drupal hooks, forms, and list scoping.
+
+**Changed:**
+None.
+
+**Rejected:**
+None.
+
+## July 22, 2026 — AI code review hardening (points 1–8)
+
+**Prompt:**
+As a senior developer, review the implementation done till now. Follow-up: implement
+review points 1–8 and log the prompt summary in implementation.md.
+
+**AI response summary:**
+Conducted AI-assisted senior review of M1–M3 implementation; identified access cache
+gaps, over-broad constraints, permission mismatch, list-scope performance, Views alias
+fragility, local task handling, comment form UX, and strict_types in .module. Applied
+fixes: comment `hook_entity_access` cache metadata; ticket-only title constraint
+(base field attach + bundle check in validator) and ticket-bundle-only status
+transition constraint; custom `manage scoped tickets` / `transition scoped tickets` permissions
+(replaced Agent `edit any ticket content`); single-query Agent list scope via shared
+helpers; `ensureTable()` for Views base alias; robust local task unset loop; removed
+comment form `#access` hacks (entity access authoritative); removed `declare(strict_types)`
+from .module. Point 9 (refactor procedural hooks into OOP plugins/event subscribers)
+deferred — thin `.module` hooks with `\Drupal::service()` remain acceptable per project
+rules and current milestone scope.
+
+**Accepted:**
+Review-driven hardening before M4 Functional tests (points 1–8).
+
+**Changed:**
+`web/modules/custom/support_ticket/support_ticket.module`,
+`web/modules/custom/support_ticket/support_ticket.permissions.yml`,
+`web/modules/custom/support_ticket/config/install/user.role.agent.yml`,
+`web/modules/custom/support_ticket/src/TicketAccessService.php`,
+`web/modules/custom/support_ticket/src/TicketStatusService.php`,
+`web/modules/custom/support_ticket/src/Plugin/Validation/Constraint/TicketStatusTransitionConstraint.php`,
+`web/modules/custom/support_ticket/src/Plugin/Validation/Constraint/TicketTitleLengthConstraintValidator.php`,
+`ai-prompts/implementation.md`.
+
+**Rejected:**
+Point 9 — extract hook logic (form alters, `hook_views_query_alter`, local tasks) into
+dedicated OOP plugins or event subscribers instead of `\Drupal::service()` in
+`support_ticket.module`. Deferred: project rules allow thin procedural hooks; M4
+Functional work takes priority; refactor can follow if `.module` grows further.

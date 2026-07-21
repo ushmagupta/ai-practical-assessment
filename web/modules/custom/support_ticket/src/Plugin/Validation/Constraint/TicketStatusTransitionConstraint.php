@@ -23,4 +23,11 @@ class TicketStatusTransitionConstraint extends SymfonyConstraint {
    */
   public string $message = 'Invalid status transition from @from to @to.';
 
+  /**
+   * Ticket bundles this constraint applies to.
+   *
+   * @var string[]
+   */
+  public array $bundles = ['ticket'];
+
 }

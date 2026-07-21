@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\support_ticket\Plugin\Validation\Constraint;
 
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\node\NodeInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -17,6 +19,13 @@ class TicketTitleLengthConstraintValidator extends ConstraintValidator {
    */
   public function validate(mixed $items, Constraint $constraint): void {
     if (!$constraint instanceof TicketTitleLengthConstraint) {
+      return;
+    }
+    if (!$items instanceof FieldItemListInterface) {
+      return;
+    }
+    $entity = $items->getEntity();
+    if (!$entity instanceof NodeInterface || $entity->bundle() !== 'ticket') {
       return;
     }
     if ($items->isEmpty()) {

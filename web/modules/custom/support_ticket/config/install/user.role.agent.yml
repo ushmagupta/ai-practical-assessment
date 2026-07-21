@@ -6,6 +6,7 @@ dependencies:
   module:
     - comment
     - node
+    - support_ticket
 id: agent
 label: Agent
 weight: 3
@@ -14,8 +15,9 @@ permissions:
   - 'access comments'
   - 'access content'
   - 'create ticket content'
-  - 'edit any ticket content'
   - 'edit own comments'
   - 'edit own ticket content'
+  - 'manage scoped tickets'
   - 'post comments'
   - 'skip comment approval'
+  - 'transition scoped tickets'

@@ -1,0 +1,6 @@
+manage scoped tickets:
+  title: 'Manage scoped tickets'
+  description: 'Edit and assign tickets within the Agent queue scope. Access is enforced by TicketAccessService.'
+transition scoped tickets:
+  title: 'Transition scoped tickets'
+  description: 'Change workflow status on tickets within the Agent queue scope.'

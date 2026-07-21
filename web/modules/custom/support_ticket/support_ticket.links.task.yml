@@ -1,0 +1,5 @@
+support_ticket.ticket_transition:
+  route_name: support_ticket.ticket_transition
+  base_route: entity.node.canonical
+  title: 'Change status'
+  weight: 15
