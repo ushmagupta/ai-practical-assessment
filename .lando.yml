@@ -20,5 +20,5 @@ tooling:
   site-install:
     service: appserver
     description: Install Drupal with the standard profile
-    cmd: drush site:install standard --db-url=mysql://drupal10:drupal10@database/drupal10 --account-name=admin --account-pass=admin -y
+    cmd: drush site:install standard --db-url=mysql://drupal10:drupal10@database/drupal10 --site-name="Support Ticket System" --account-name=admin --account-pass=admin -y
     dir: /app/web

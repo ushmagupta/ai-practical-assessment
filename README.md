@@ -15,7 +15,7 @@ Drupal 10 monolith for internal support ticket management. Custom module and the
 lando start
 lando composer install
 
-# Install Drupal (standard profile)
+# Install Drupal (standard profile, site name: Support Ticket System)
 lando site-install
 
 # Enable custom module and theme
@@ -41,8 +41,12 @@ For non-Lando setups, copy `.env.example` to `.env` and configure your database 
 composer install
 cp web/sites/default/default.settings.php web/sites/default/settings.php
 # Edit settings.php with your database credentials, then:
-vendor/bin/drush --root=web site:install standard -y
-vendor/bin/drush --root=web en support_ticket support_ticket_theme -y
+vendor/bin/drush --root=web site:install standard \
+  --site-name="Support Ticket System" \
+  -y
+vendor/bin/drush --root=web en support_ticket -y
+vendor/bin/drush --root=web theme:enable support_ticket_theme -y
+vendor/bin/drush --root=web config:set system.theme default support_ticket_theme -y
 ```
 
 ## Admin bootstrap (FR-10)
@@ -51,6 +55,7 @@ The first Admin account is created during `site:install`:
 
 | Setting | Lando default | CI default |
 |---------|---------------|------------|
+| Site name | `Support Ticket System` | `Support Ticket System` |
 | Username | `admin` | `admin` |
 | Password | `admin` | `admin` |
 
@@ -60,6 +65,8 @@ For production or shared environments, create the Admin via install with explici
 
 ```bash
 lando drush site:install standard \
+  --db-url=mysql://drupal10:drupal10@database/drupal10 \
+  --site-name="Support Ticket System" \
   --account-name=YOUR_ADMIN \
   --account-pass=YOUR_SECURE_PASSWORD \
   -y
