@@ -44,6 +44,21 @@ functional tests for 403 + absent Edit tab on closed/cancelled tickets.
 
 **Rejected:** Changing Resolved terminal semantics (explicitly out of scope).
 
+## July 22, 2026 — hook_node_access returned neutral instead of forbidden
+
+**Context:** Follow-up while verifying issue #2.
+
+**Prompt:** Terminal edit still allowed despite canUpdate() returning false.
+
+**AI response summary:** `AccessResult::allowedIf(false)` is neutral in Drupal 10, so
+core `edit own ticket content` still granted update. Hooks now return explicit
+`allowed()` / `forbidden()`.
+
+**Accepted:** Explicit forbidden on deny for ticket access hooks.
+
+**Changed:** `web/modules/custom/support_ticket/support_ticket.module`,
+`web/modules/custom/support_ticket/tests/src/Kernel/TicketAccessServiceTest.php`.
+
 ## July 22, 2026 — Reporter sees assignee when ticket is unassigned
 
 **Context:** Found during manual review during implementation.
@@ -67,6 +82,21 @@ functional tests for unassigned and assigned cases.
 
 **Rejected:** Twig conditionals or isset()-guarded hook_node_view logic.
 
+## July 22, 2026 — Reporter sees assignee on ticket edit form
+
+**Context:** Manual review — assignee field visible at `/node/{id}/edit` for Reporter.
+
+**Prompt:** assignedto still visible to reporter on edit form.
+
+**AI response summary:** Form alter was registered as `hook_form_node_ticket_form_alter`,
+which only applies to the add form. Edit uses base form `node_form`. Moved logic to
+`hook_form_node_form_alter` with ticket bundle check.
+
+**Accepted:** Single alter on `node_form` covering add and edit.
+
+**Changed:** `web/modules/custom/support_ticket/support_ticket.module`,
+`web/modules/custom/support_ticket/tests/src/Functional/TicketFormFunctionalTest.php`.
+
 ## July 22, 2026 — Login lands on unscoped /node instead of /tickets
 
 **Context:** Found during manual review during implementation.
@@ -89,3 +119,49 @@ redirect direct `/node` requests to `/tickets`, closing the backdoor around
 `web/modules/custom/support_ticket/tests/src/Functional/TicketFrontpageFunctionalTest.php`.
 
 **Rejected:** Relying on front page config alone without blocking /node direct access.
+
+## July 22, 2026 — Front page still /node on existing install
+
+**Context:** Found during manual review.
+
+**Prompt:** Front page still set to /node; it should be /tickets.
+
+**AI response summary:** Install hook only ran on first enable; existing sites never
+received `page.front` update. Added idempotent `support_ticket_update_9002()` and
+`hook_enable()` calling `support_ticket_set_front_page()`. Extended
+`FrontpageRedirectSubscriber` to redirect `/` when `page.front` is still `/node`,
+not only direct `/node` requests.
+
+**Accepted:** Config update + enable hook + subscriber fallback for stale config.
+
+**Changed:**
+`web/modules/custom/support_ticket/support_ticket.install`,
+`web/modules/custom/support_ticket/support_ticket.module`,
+`web/modules/custom/support_ticket/src/EventSubscriber/FrontpageRedirectSubscriber.php`.
+
+**Rejected:** Relying on a one-time install hook without an update path for existing sites.
+
+## July 22, 2026 — Comments not visible on ticket detail
+
+**Context:** Found during manual review.
+
+**Prompt:** Comments field not visible for users to comment on raised tickets.
+
+**AI response summary:** Comment field config was in `config/optional/` (often not
+imported) and `core.entity_view_display.node.ticket.default` had no `comment`
+component, so the thread and add form never rendered. Moved field storage/instance
+to `config/install/`, added `comment_default` formatter to the view display, and
+added `support_ticket_ensure_ticket_comments()` for existing sites via update 9002
+and `hook_enable()`.
+
+**Accepted:** Ship comment field in install config; programmatic ensure for existing DBs.
+
+**Changed:**
+`web/modules/custom/support_ticket/config/install/field.storage.node.comment.yml`,
+`web/modules/custom/support_ticket/config/install/field.field.node.ticket.comment.yml`,
+`web/modules/custom/support_ticket/config/install/core.entity_view_display.node.ticket.default.yml`,
+`web/modules/custom/support_ticket/support_ticket.install`,
+`web/modules/custom/support_ticket/support_ticket.module`,
+`web/modules/custom/support_ticket/tests/src/Kernel/ModuleEnableTest.php`.
+
+**Rejected:** Leaving comment config optional and expecting manual admin field setup.

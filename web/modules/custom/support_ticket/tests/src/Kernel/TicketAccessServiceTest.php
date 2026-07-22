@@ -121,6 +121,20 @@ class TicketAccessServiceTest extends SupportTicketKernelTestBase {
   }
 
   /**
+   * Cancelled tickets deny entity update access for reporters.
+   */
+  public function testCancelledTicketEntityUpdateAccessDenied(): void {
+    $reporter = $this->createUser(['reporter']);
+    $ticket = $this->createTicket([
+      'uid' => $reporter->id(),
+      'field_ticket_status' => 'cancelled',
+    ]);
+
+    $hook_result = support_ticket_node_access($ticket, 'update', $reporter);
+    $this->assertTrue($hook_result->isForbidden(), 'support_ticket_node_access must forbid terminal updates.');
+  }
+
+  /**
    * Comment access follows role and terminal rules.
    */
   public function testCommentAccess(): void {

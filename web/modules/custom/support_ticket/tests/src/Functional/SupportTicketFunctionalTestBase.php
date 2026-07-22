@@ -52,8 +52,10 @@ abstract class SupportTicketFunctionalTestBase extends BrowserTestBase {
     $view = \Drupal::entityTypeManager()->getStorage('view')->load('tickets');
     $this->assertNotNull($view, 'The tickets view must be installed.');
     $this->assertTrue($view->status(), 'The tickets view must be enabled.');
+    $this->config('system.site')->set('page.front', '/tickets')->save();
     $this->rebuildAll();
   }
+
   /**
    * Creates a user with the given roles.
    *

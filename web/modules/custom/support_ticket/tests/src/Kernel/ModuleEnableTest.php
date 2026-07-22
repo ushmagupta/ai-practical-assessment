@@ -72,6 +72,7 @@ class ModuleEnableTest extends KernelTestBase {
     $this->assertArrayHasKey('field_priority', $field_definitions);
     $this->assertArrayHasKey('field_assigned_to', $field_definitions);
     $this->assertArrayHasKey('field_description', $field_definitions);
+    $this->assertArrayHasKey('comment', $field_definitions);
 
     $role_storage = $this->container->get('entity_type.manager')
       ->getStorage('user_role');
@@ -97,6 +98,7 @@ class ModuleEnableTest extends KernelTestBase {
       ->load('node.ticket.default');
     $this->assertNotNull($view_display);
     $this->assertArrayHasKey('field_ticket_status', $view_display->getComponents());
+    $this->assertArrayHasKey('comment', $view_display->getComponents());
   }
 
 }

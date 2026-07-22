@@ -5,6 +5,11 @@
  * Install, update and uninstall functions for the Support Ticket module.
  */
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
 /**
  * Implements hook_install().
  */
@@ -22,8 +27,81 @@ function support_ticket_set_front_page(): void {
 }
 
 /**
+ * Ensures ticket nodes expose the core comment field on the detail view.
+ */
+function support_ticket_ensure_ticket_comments(): void {
+  if (!FieldStorageConfig::loadByName('node', 'comment')) {
+    FieldStorageConfig::create([
+      'field_name' => 'comment',
+      'entity_type' => 'node',
+      'type' => 'comment',
+      'settings' => ['comment_type' => 'comment'],
+    ])->save();
+  }
+
+  if (!FieldConfig::loadByName('node', 'ticket', 'comment')) {
+    FieldConfig::create([
+      'field_name' => 'comment',
+      'entity_type' => 'node',
+      'bundle' => 'ticket',
+      'label' => 'Comments',
+      'settings' => [
+        'default_mode' => 1,
+        'per_page' => 50,
+        'anonymous' => 0,
+        'form_location' => TRUE,
+        'preview' => 0,
+      ],
+    ])->save();
+  }
+
+  $display = EntityViewDisplay::load('node.ticket.default');
+  if ($display && !$display->getComponent('comment')) {
+    $display->setComponent('comment', [
+      'type' => 'comment_default',
+      'label' => 'above',
+      'settings' => [
+        'view_mode' => 'default',
+        'pager_id' => 0,
+      ],
+      'weight' => 110,
+      'region' => 'content',
+    ])->save();
+  }
+
+  support_ticket_ensure_comment_subject_hidden();
+}
+
+/**
+ * Hides the core comment subject field on add/edit forms.
+ */
+function support_ticket_ensure_comment_subject_hidden(): void {
+  $display = EntityFormDisplay::load('comment.comment.default');
+  if (!$display) {
+    return;
+  }
+  $display->removeComponent('subject');
+  $display->save();
+}
+
+/**
  * Redirect front page to /tickets and block unscoped /node listing.
  */
 function support_ticket_update_9001(): void {
   support_ticket_set_front_page();
+}
+
+/**
+ * Re-apply front page and comment display for existing installs.
+ */
+function support_ticket_update_9002(): void {
+  support_ticket_set_front_page();
+  support_ticket_ensure_ticket_comments();
+}
+
+/**
+ * Hide comment subject field on existing installs.
+ */
+function support_ticket_update_9003(): void {
+  support_ticket_ensure_comment_subject_hidden();
 }

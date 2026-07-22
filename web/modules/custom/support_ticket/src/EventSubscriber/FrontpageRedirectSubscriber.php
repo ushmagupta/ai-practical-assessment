@@ -33,11 +33,11 @@ class FrontpageRedirectSubscriber implements EventSubscriberInterface {
 
     $request = $event->getRequest();
     $path = rtrim($request->getPathInfo(), '/') ?: '/';
-    if ($path !== '/node') {
-      return;
-    }
+    $front = \Drupal::config('system.site')->get('page.front');
 
-    $event->setResponse(new RedirectResponse('/tickets', RedirectResponse::HTTP_FOUND));
+    if ($path === '/node' || ($path === '/' && $front === '/node')) {
+      $event->setResponse(new RedirectResponse('/tickets', RedirectResponse::HTTP_FOUND));
+    }
   }
 
 }
