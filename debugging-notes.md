@@ -46,4 +46,27 @@ route and no Edit link on detail for closed and cancelled.
 Refactored `hook_menu_local_tasks_alter` to unset Edit and transition tabs when
 `!canUpdate()`; transition tab alone when update allowed but transition denied.
 
-## Issue 3
+## Issue 3 — Reporter sees assignee when ticket is unassigned
+
+### Problem
+Reporters saw the "Assigned to" label on ticket detail when the field was empty.
+FR-19 requires assignee to be omitted from all reporter output.
+
+### How I Investigated
+Manual review of unassigned own ticket as Reporter; `hook_node_view` used
+`isset($build['field_assigned_to'])` which could miss empty-field render paths.
+
+### How AI Helped
+Recommended centralizing in `TicketAccessService::filterRenderedTicket()` and
+calling from `hook_entity_view_alter` without value conditionals, per
+design-notes.md.
+
+### What I Validated
+Kernel: `filterRenderedTicket()` removes assignee for reporter regardless of
+assignment. Functional: no "Assigned to" text for unassigned and assigned tickets.
+
+### Final Fix
+Added `filterRenderedTicket()`; replaced `hook_node_view` with
+`hook_entity_view_alter`; kept list column hiding in `hook_views_pre_render`.
+
+## Issue 4

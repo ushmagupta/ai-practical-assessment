@@ -200,6 +200,18 @@ class TicketAccessService {
   }
 
   /**
+   * Removes ticket fields from render arrays per role rules (FR-19).
+   *
+   * @param array<string, mixed> $build
+   *   The entity view render array.
+   */
+  public function filterRenderedTicket(array &$build, AccountInterface $account): void {
+    if ($account->hasRole('reporter')) {
+      unset($build['field_assigned_to']);
+    }
+  }
+
+  /**
    * Whether a ticket is in a terminal workflow status.
    */
   protected function isTicketTerminal(NodeInterface $ticket): bool {

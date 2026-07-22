@@ -43,3 +43,26 @@ functional tests for 403 + absent Edit tab on closed/cancelled tickets.
 `web/modules/custom/support_ticket/tests/src/Functional/TicketTerminalEditFunctionalTest.php`.
 
 **Rejected:** Changing Resolved terminal semantics (explicitly out of scope).
+
+## July 22, 2026 — Reporter sees assignee when ticket is unassigned
+
+**Context:** Found during manual review during implementation.
+
+**Prompt:** Fix issue #3 — Reporter sees assignedTo when null/unassigned. Strip from
+render array by role via TicketAccessService::filterRenderedTicket(), not Twig.
+
+**AI response summary:** Added `filterRenderedTicket()` to `TicketAccessService`
+that unconditionally unsets `field_assigned_to` for reporters. Replaced
+`hook_node_view` with `hook_entity_view_alter` delegating to the service.
+Retained `hook_views_pre_render` for list column hiding. Added kernel and
+functional tests for unassigned and assigned cases.
+
+**Accepted:** Service-owned render filtering per design-notes.md.
+
+**Changed:**
+`web/modules/custom/support_ticket/src/TicketAccessService.php`,
+`web/modules/custom/support_ticket/support_ticket.module`,
+`web/modules/custom/support_ticket/tests/src/Kernel/TicketRenderFilterTest.php`,
+`web/modules/custom/support_ticket/tests/src/Functional/TicketAssigneeRenderFunctionalTest.php`.
+
+**Rejected:** Twig conditionals or isset()-guarded hook_node_view logic.

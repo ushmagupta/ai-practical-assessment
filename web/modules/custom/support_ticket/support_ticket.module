@@ -181,15 +181,15 @@ function support_ticket_node_ticket_form_validate(array &$form, FormStateInterfa
 }
 
 /**
- * Implements hook_node_view().
+ * Implements hook_entity_view_alter().
  */
-function support_ticket_node_view(array &$build, NodeInterface $node, $view_mode): void {
-  if ($node->bundle() !== 'ticket') {
+function support_ticket_entity_view_alter(array &$build, EntityInterface $entity, $display, $view_mode): void {
+  if (!$entity instanceof NodeInterface || $entity->bundle() !== 'ticket') {
     return;
   }
-  if (\Drupal::currentUser()->hasRole('reporter') && isset($build['field_assigned_to'])) {
-    unset($build['field_assigned_to']);
-  }
+
+  \Drupal::service('support_ticket.access')
+    ->filterRenderedTicket($build, \Drupal::currentUser());
 }
 
 /**
@@ -231,6 +231,20 @@ function support_ticket_views_query_alter(ViewExecutable $view, ViewsSqlQuery $q
 
   \Drupal::service('support_ticket.access')
     ->applyListScopeToViewsQuery($query, \Drupal::currentUser());
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function support_ticket_views_pre_render(ViewExecutable $view): void {
+  if ($view->id() !== 'tickets') {
+    return;
+  }
+
+  $account = \Drupal::currentUser();
+  if ($account->hasRole('reporter') && isset($view->field['field_assigned_to'])) {
+    unset($view->field['field_assigned_to']);
+  }
 }
 
 /**
