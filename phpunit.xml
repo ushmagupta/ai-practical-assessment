@@ -18,5 +18,8 @@
     <testsuite name="kernel">
       <directory>web/modules/custom/support_ticket/tests/src/Kernel</directory>
     </testsuite>
+    <testsuite name="functional">
+      <directory>web/modules/custom/support_ticket/tests/src/Functional</directory>
+    </testsuite>
   </testsuites>
 </phpunit>
