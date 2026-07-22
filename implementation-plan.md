@@ -39,22 +39,22 @@ Grouped checklist — each area built and verified per test-strategy (Kernel, Fu
 - [x] Six validation constraints + user delete guards → Kernel
 
 ### Access & forms integration
-- [ ] Node access hooks and route callbacks → Kernel + Functional
-- [ ] Views query alter (list scoping) → Functional
-- [ ] Transition form (sole status-change path) → Kernel + Functional
-- [ ] Node form alters (role field matrix, status off edit form) → Functional
-- [ ] Status re-check on write forms → Functional
-- [ ] Anonymous redirect on protected routes → Functional
+- [x] Node access hooks and route callbacks → Kernel + Functional
+- [x] Views query alter (list scoping) → Functional
+- [x] Transition form (sole status-change path) → Kernel + Functional
+- [x] Node form alters (role field matrix, status off edit form) → Functional
+- [x] Status re-check on write forms → Functional
+- [x] Anonymous redirect on protected routes → Functional
 
 ### Feature flows
-- [ ] Ticket create/edit/delete and create defaults
-- [ ] Assignment rules (manual only, Agent-only assignee, self-assign, Reporter denial)
-- [ ] State machine via transition form
-- [ ] Terminal ticket read-only behavior
-- [ ] Comments (add, edit own, no delete)
-- [ ] User management and delete blocking
-- [ ] Ticket list: search, filters, sort, pagination, role visibility
-- [ ] Error presentation (inline validation, access denied)
+- [x] Ticket create/edit/delete and create defaults
+- [x] Assignment rules (manual only, Agent-only assignee, self-assign, Reporter denial)
+- [x] State machine via transition form
+- [x] Terminal ticket read-only behavior
+- [x] Comments (add, edit own, no delete)
+- [x] User management and delete blocking
+- [x] Ticket list: search, filters, sort, pagination, role visibility
+- [x] Error presentation (inline validation, access denied)
 
 ### Theme & presentation
 - [ ] Twig overrides (assignee hidden for Reporter, terminal read-only)
@@ -74,8 +74,8 @@ Grouped checklist — each area built and verified per test-strategy (Kernel, Fu
 | **M1b** ✅ | Data model installed via config-as-code | Module enable installs config; `/tickets` loads; form/view displays place fields on ticket screens |
 | **M1** ✅ | Foundation complete (M1a + M1b) | July 2026 — CI green; clean module enable verified |
 | **M2** ✅ | Domain rules correct in isolation | All P0 Kernel tests pass (services, constraints, delete guards) |
-| **M3** | Drupal wired to domain rules | Access hooks, transition form, form alters, View alter in place; P0 Functional paths pass |
-| **M4** | End-to-end ticket, comment, user, and list flows | P1 + representative P2 Functional tests pass |
+| **M3** ✅ | Drupal wired to domain rules | Access hooks, transition form, form alters, View alter in place; P0 Functional paths pass |
+| **M4** ✅ | End-to-end ticket, comment, user, and list flows | P1 + representative P2 Functional tests pass |
 | **M5** | Screens match ui-flow presentation | Theme, local tasks, empty-state copy in place; Reporter assignee absent from output |
 | **M6** | Submission-ready | CI green; acceptance-criteria Core/Validation/Error Handling covered per test-strategy tiers |
 
