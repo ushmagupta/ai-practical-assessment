@@ -196,7 +196,7 @@ function support_ticket_node_view(array &$build, NodeInterface $node, $view_mode
  * Implements hook_menu_local_tasks_alter().
  */
 function support_ticket_menu_local_tasks_alter(array &$data, string $route_name): void {
-  if ($route_name !== 'entity.node.canonical') {
+  if (!in_array($route_name, ['entity.node.canonical', 'entity.node.edit_form'], TRUE)) {
     return;
   }
 
@@ -206,13 +206,16 @@ function support_ticket_menu_local_tasks_alter(array &$data, string $route_name)
   }
 
   $account = \Drupal::currentUser();
+  $access = \Drupal::service('support_ticket.access');
   $status = \Drupal::service('support_ticket.status');
-  if ($status->canUserTransitionTicket($account, $node)) {
-    return;
-  }
 
   foreach ($data['tabs'] as &$tab_level) {
-    if (isset($tab_level['support_ticket.ticket_transition'])) {
+    if (!$access->canUpdate($account, $node)) {
+      unset($tab_level['entity.node.edit_form']);
+      unset($tab_level['support_ticket.ticket_transition']);
+      continue;
+    }
+    if (!$status->canUserTransitionTicket($account, $node)) {
       unset($tab_level['support_ticket.ticket_transition']);
     }
   }
