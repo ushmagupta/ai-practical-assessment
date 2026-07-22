@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\support_ticket\EventSubscriber;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
+/**
+ * Redirects unscoped core frontpage requests to the ticket list.
+ */
+class FrontpageRedirectSubscriber implements EventSubscriberInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents(): array {
+    return [
+      KernelEvents::REQUEST => ['onRequest', 30],
+    ];
+  }
+
+  /**
+   * Redirects /node (core frontpage view) to the scoped tickets list.
+   */
+  public function onRequest(RequestEvent $event): void {
+    if (!$event->isMainRequest()) {
+      return;
+    }
+
+    $request = $event->getRequest();
+    $path = rtrim($request->getPathInfo(), '/') ?: '/';
+    if ($path !== '/node') {
+      return;
+    }
+
+    $event->setResponse(new RedirectResponse('/tickets', RedirectResponse::HTTP_FOUND));
+  }
+
+}

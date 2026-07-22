@@ -69,4 +69,27 @@ assignment. Functional: no "Assigned to" text for unassigned and assigned ticket
 Added `filterRenderedTicket()`; replaced `hook_node_view` with
 `hook_entity_view_alter`; kept list column hiding in `hook_views_pre_render`.
 
-## Issue 4
+## Issue 4 — Login lands on unscoped /node instead of /tickets
+
+### Problem
+After login, users landed on `/node` (Drupal default frontpage view), which lists
+published content without `TicketAccessService` row scoping — a data exposure risk
+for Agent/Reporter roles.
+
+### How I Investigated
+Manual login as Reporter; confirmed redirect to `/node` and visibility of tickets
+outside role scope. Checked `system.site` config — `page.front` still `/node`.
+
+### How AI Helped
+Recommended setting `page.front` to `/tickets` via install/update hook **and**
+redirecting direct `/node` hits via a request subscriber, since front page config
+alone does not block bookmarked `/node` URLs.
+
+### What I Validated
+Functional: login lands on `/tickets`; `GET /node` redirects to `/tickets` and
+does not show another reporter's ticket.
+
+### Final Fix
+`support_ticket.install` + `support_ticket_update_9001()` set front page;
+`FrontpageRedirectSubscriber` redirects `/node` → `/tickets`.
+

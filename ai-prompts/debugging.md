@@ -66,3 +66,26 @@ functional tests for unassigned and assigned cases.
 `web/modules/custom/support_ticket/tests/src/Functional/TicketAssigneeRenderFunctionalTest.php`.
 
 **Rejected:** Twig conditionals or isset()-guarded hook_node_view logic.
+
+## July 22, 2026 — Login lands on unscoped /node instead of /tickets
+
+**Context:** Found during manual review during implementation.
+
+**Prompt:** Fix issue #4 — post-login lands on /node (unscoped). Set destination to
+/tickets and prevent /node from leaking unfiltered tickets.
+
+**AI response summary:** Added `support_ticket.install` and update hook to set
+`system.site:page.front` to `/tickets`. Added `FrontpageRedirectSubscriber` to
+redirect direct `/node` requests to `/tickets`, closing the backdoor around
+`TicketAccessService` list scoping. Functional tests cover login redirect and
+/node redirect without exposing other users' tickets.
+
+**Accepted:** Config + request subscriber (belt and suspenders).
+
+**Changed:**
+`web/modules/custom/support_ticket/support_ticket.install`,
+`web/modules/custom/support_ticket/src/EventSubscriber/FrontpageRedirectSubscriber.php`,
+`web/modules/custom/support_ticket/support_ticket.services.yml`,
+`web/modules/custom/support_ticket/tests/src/Functional/TicketFrontpageFunctionalTest.php`.
+
+**Rejected:** Relying on front page config alone without blocking /node direct access.

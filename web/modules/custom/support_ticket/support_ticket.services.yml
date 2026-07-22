@@ -11,3 +11,7 @@ services:
     class: Drupal\support_ticket\EventSubscriber\TicketsRouteSubscriber
     tags:
       - { name: event_subscriber }
+  support_ticket.frontpage_redirect_subscriber:
+    class: Drupal\support_ticket\EventSubscriber\FrontpageRedirectSubscriber
+    tags:
+      - { name: event_subscriber }

@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Support Ticket module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function support_ticket_install(): void {
+  support_ticket_set_front_page();
+}
+
+/**
+ * Sets the site front page to the role-scoped ticket list.
+ */
+function support_ticket_set_front_page(): void {
+  \Drupal::configFactory()->getEditable('system.site')
+    ->set('page.front', '/tickets')
+    ->save(TRUE);
+}
+
+/**
+ * Redirect front page to /tickets and block unscoped /node listing.
+ */
+function support_ticket_update_9001(): void {
+  support_ticket_set_front_page();
+}
