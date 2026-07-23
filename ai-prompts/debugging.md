@@ -165,3 +165,28 @@ and `hook_enable()`.
 `web/modules/custom/support_ticket/tests/src/Kernel/ModuleEnableTest.php`.
 
 **Rejected:** Leaving comment config optional and expecting manual admin field setup.
+
+## July 23, 2026 — Anonymous 403 on site front page (`/`)
+
+**Context:** Found during manual review while resuming M6 (opening Lando site URL
+before login).
+
+**Prompt:** Site URL giving 403 for anonymous users. Front page is set to `/tickets`
+— diagnose and fix.
+
+**AI response summary:** Diagnosed a gap in `FrontpageRedirectSubscriber`: anonymous
+redirect to `/user/login` ran only when the path was `/tickets`, not `/`. With
+`page.front` = `/tickets`, the homepage still served the protected tickets view at
+`/` and returned 403. Fix: treat `/` as a protected path when front page is
+`/tickets` (`isProtectedTicketsPath()`). Tightened smoke test to assert login
+redirect for both `/` and `/tickets`.
+
+**Accepted:** Request-subscriber redirect for anonymous on `/` and `/tickets`.
+
+**Changed:**
+`web/modules/custom/support_ticket/src/EventSubscriber/FrontpageRedirectSubscriber.php`,
+`web/modules/custom/support_ticket/tests/src/Functional/TicketSmokeFunctionalTest.php`,
+`debugging-notes.md`, `ai-prompts/debugging.md`.
+
+**Rejected:** Accepting 403 as valid anonymous homepage behavior (FR-2 requires
+login redirect or access denial; redirect is the intended UX).

@@ -160,3 +160,30 @@ Moved `field.storage.node.comment` and `field.field.node.ticket.comment` to inst
 added `comment` to view display YAML; `support_ticket_ensure_ticket_comments()` in
 install file for existing sites.
 
+## Issue 7 — Anonymous 403 on site front page (`/`)
+
+### Problem
+With `system.site:page.front` set to `/tickets`, anonymous visitors to the site
+root (`https://support-ticket.lndo.site/`) received **403 Access denied** instead
+of being sent to the login form. Direct `/tickets` could redirect correctly, but
+the homepage URL did not.
+
+### How I Investigated
+Found during **manual review** while resuming M6 ship-ready work (opening the
+Lando site URL before login). Reproduced in browser: `/` → 403; `/user/login` → OK.
+
+### How AI Helped
+Asked Cursor to diagnose the 403. Root cause: `FrontpageRedirectSubscriber` only
+redirected anonymous users when the request path was exactly `/tickets`. Visiting
+`/` still resolved the front page to the login-protected tickets view internally,
+so Drupal returned 403 on `/` without a login redirect.
+
+### What I Validated
+Smoke test `testAuthGateAndListAccess` updated to assert `/user/login` for both
+`/` and `/tickets` as anonymous. `lando phpunit --filter testAuthGateAndListAccess`
+passes.
+
+### Final Fix
+Extended `FrontpageRedirectSubscriber::isProtectedTicketsPath()` so anonymous
+requests to `/` are redirected to `/user/login` when `page.front` is `/tickets`.
+

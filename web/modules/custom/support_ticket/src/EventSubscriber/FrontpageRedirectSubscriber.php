@@ -33,17 +33,23 @@ class FrontpageRedirectSubscriber implements EventSubscriberInterface {
 
     $request = $event->getRequest();
     $path = rtrim($request->getPathInfo(), '/') ?: '/';
+    $front = \Drupal::config('system.site')->get('page.front');
 
-    if ($path === '/tickets' && \Drupal::currentUser()->isAnonymous()) {
+    if (\Drupal::currentUser()->isAnonymous() && $this->isProtectedTicketsPath($path, $front)) {
       $event->setResponse(new RedirectResponse('/user/login', RedirectResponse::HTTP_FOUND));
       return;
     }
 
-    $front = \Drupal::config('system.site')->get('page.front');
-
     if ($path === '/node' || ($path === '/' && $front === '/node')) {
       $event->setResponse(new RedirectResponse('/tickets', RedirectResponse::HTTP_FOUND));
     }
+  }
+
+  /**
+   * Whether the request targets the login-protected ticket list.
+   */
+  protected function isProtectedTicketsPath(string $path, ?string $front): bool {
+    return $path === '/tickets' || ($path === '/' && $front === '/tickets');
   }
 
 }

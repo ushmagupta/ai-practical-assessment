@@ -17,13 +17,10 @@ class TicketSmokeFunctionalTest extends SupportTicketFunctionalTestBase {
    * Anonymous gate, login redirect, and authenticated list access.
    */
   public function testAuthGateAndListAccess(): void {
-    $this->drupalGet('/tickets');
-    $path = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH) ?: '';
-    $status = $this->getSession()->getStatusCode();
-    $this->assertTrue(
-      $path === '/user/login' || $status === 403,
-      'Anonymous users must be redirected to login or receive access denied.'
-    );
+    foreach (['/', '/tickets'] as $protected_path) {
+      $this->drupalGet($protected_path);
+      $this->assertSession()->addressEquals('/user/login');
+    }
 
     $reporter = $this->createRoleUser(['reporter'], 'smoke_reporter');
     $this->drupalGet('/user/login');
