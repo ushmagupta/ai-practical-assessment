@@ -76,8 +76,14 @@ class ModuleEnableTest extends KernelTestBase {
 
     $role_storage = $this->container->get('entity_type.manager')
       ->getStorage('user_role');
-    $this->assertNotNull($role_storage->load('agent'));
-    $this->assertNotNull($role_storage->load('reporter'));
+    $agent = $role_storage->load('agent');
+    $reporter = $role_storage->load('reporter');
+    $this->assertNotNull($agent);
+    $this->assertNotNull($reporter);
+    $this->assertTrue($agent->hasPermission('manage scoped tickets'));
+    $this->assertTrue($agent->hasPermission('transition scoped tickets'));
+    $this->assertFalse($reporter->hasPermission('manage scoped tickets'));
+    $this->assertFalse($reporter->hasPermission('transition scoped tickets'));
 
     $view = $this->container->get('entity_type.manager')
       ->getStorage('view')

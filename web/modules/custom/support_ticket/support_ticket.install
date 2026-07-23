@@ -15,6 +15,23 @@ use Drupal\field\Entity\FieldStorageConfig;
  */
 function support_ticket_install(): void {
   support_ticket_set_front_page();
+  support_ticket_ensure_agent_permissions();
+}
+
+/**
+ * Grants scoped ticket permissions to the Agent role.
+ */
+function support_ticket_ensure_agent_permissions(): void {
+  $role = \Drupal::entityTypeManager()->getStorage('user_role')->load('agent');
+  if (!$role) {
+    return;
+  }
+  foreach (['manage scoped tickets', 'transition scoped tickets'] as $permission) {
+    if (!$role->hasPermission($permission)) {
+      $role->grantPermission($permission);
+    }
+  }
+  $role->save();
 }
 
 /**
@@ -104,4 +121,11 @@ function support_ticket_update_9002(): void {
  */
 function support_ticket_update_9003(): void {
   support_ticket_ensure_comment_subject_hidden();
+}
+
+/**
+ * Ensures Agent role has manage/transition scoped ticket permissions.
+ */
+function support_ticket_update_9004(): void {
+  support_ticket_ensure_agent_permissions();
 }

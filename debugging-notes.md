@@ -187,3 +187,20 @@ passes.
 Extended `FrontpageRedirectSubscriber::isProtectedTicketsPath()` so anonymous
 requests to `/` are redirected to `/user/login` when `page.front` is `/tickets`.
 
+## Issue 8 — Agent 403 on ticket detail and edit
+
+### Problem
+Agents could see tickets on `/tickets` but received **403** on detail (`/node/{id}`)
+and edit (`/node/{id}/edit`). Manual review after assigning Agent role to a user.
+
+### How I Investigated
+Confirmed Agent role existed but was missing `manage scoped tickets` and
+`transition scoped tickets` on the live DB. `config/install` only applies on
+first enable; list scoping checks `hasRole('agent')` while detail/edit require
+those custom permissions.
+
+### Final Fix
+Added `support_ticket_ensure_agent_permissions()` and `support_ticket_update_9004()`
+to grant both permissions to the `agent` role on existing installs. Install test
+asserts Agent has both; Reporter has neither.
+

@@ -190,3 +190,22 @@ redirect for both `/` and `/tickets`.
 
 **Rejected:** Accepting 403 as valid anonymous homepage behavior (FR-2 requires
 login redirect or access denial; redirect is the intended UX).
+
+## July 23, 2026 — Agent 403 on ticket detail and edit
+
+**Context:** Found during manual review — Agent user could list tickets but not
+open detail or edit.
+
+**Prompt:** Diagnose why agents cannot view ticket detail or edit pages.
+
+**AI response summary:** `TicketAccessService::canView()` / `canUpdate()` require
+`manage scoped tickets`; transitions require `transition scoped tickets`. Agent
+role config had both in `config/install`, but the live DB role was missing them.
+List query only checks `hasRole('agent')`, so list worked while entity routes 403'd.
+
+**Accepted:** `support_ticket_ensure_agent_permissions()` + `support_ticket_update_9004()`.
+
+**Changed:**
+`web/modules/custom/support_ticket/support_ticket.install`,
+`web/modules/custom/support_ticket/tests/src/Kernel/ModuleEnableTest.php`,
+`debugging-notes.md`, `ai-prompts/debugging.md`.
