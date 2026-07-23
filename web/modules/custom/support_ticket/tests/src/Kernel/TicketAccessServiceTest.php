@@ -98,40 +98,22 @@ class TicketAccessServiceTest extends SupportTicketKernelTestBase {
    */
   public function testTerminalTicketWriteDenial(): void {
     $admin = $this->createUser(['administrator']);
-    $ticket = $this->createTicket(['field_ticket_status' => 'closed']);
-
-    $this->assertTrue($this->accessService->canView($admin, $ticket));
-    $this->assertFalse($this->accessService->canUpdate($admin, $ticket));
-    $this->assertFalse($this->accessService->canAssign($admin, $ticket));
-    $this->assertFalse($this->accessService->canAddComment($admin, $ticket));
-  }
-
-  /**
-   * Cancelled tickets deny reporter updates (terminal state).
-   */
-  public function testCancelledTicketReporterUpdateDenied(): void {
     $reporter = $this->createUser(['reporter']);
-    $ticket = $this->createTicket([
+
+    $closed = $this->createTicket(['field_ticket_status' => 'closed']);
+    $this->assertTrue($this->accessService->canView($admin, $closed));
+    $this->assertFalse($this->accessService->canUpdate($admin, $closed));
+    $this->assertFalse($this->accessService->canAssign($admin, $closed));
+    $this->assertFalse($this->accessService->canAddComment($admin, $closed));
+
+    $cancelled = $this->createTicket([
       'uid' => $reporter->id(),
       'field_ticket_status' => 'cancelled',
     ]);
-
-    $this->assertTrue($this->accessService->canView($reporter, $ticket));
-    $this->assertFalse($this->accessService->canUpdate($reporter, $ticket));
-  }
-
-  /**
-   * Cancelled tickets deny entity update access for reporters.
-   */
-  public function testCancelledTicketEntityUpdateAccessDenied(): void {
-    $reporter = $this->createUser(['reporter']);
-    $ticket = $this->createTicket([
-      'uid' => $reporter->id(),
-      'field_ticket_status' => 'cancelled',
-    ]);
-
-    $hook_result = support_ticket_node_access($ticket, 'update', $reporter);
-    $this->assertTrue($hook_result->isForbidden(), 'support_ticket_node_access must forbid terminal updates.');
+    $this->assertTrue($this->accessService->canView($reporter, $cancelled));
+    $this->assertFalse($this->accessService->canUpdate($reporter, $cancelled));
+    $hook_result = support_ticket_node_access($cancelled, 'update', $reporter);
+    $this->assertTrue($hook_result->isForbidden());
   }
 
   /**

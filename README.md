@@ -82,13 +82,25 @@ Never commit real credentials. Use `.env` / `settings.local.php` (both git-ignor
 
 ## Running tests
 
+Prepare the Simpletest browser output directory once (Lando or local):
+
 ```bash
-# With Lando
+mkdir -p web/sites/simpletest/browser_output && chmod 777 web/sites/simpletest/browser_output
+```
+
+```bash
+# Fast feedback — Kernel only (~1 min)
+lando phpunit --testsuite kernel
+
+# Full suite — Kernel + Functional browser tests
 lando phpunit
 
 # Without Lando (requires composer install)
+vendor/bin/phpunit -c phpunit.xml --testsuite kernel
 vendor/bin/phpunit -c phpunit.xml
 ```
+
+Functional tests use Drupal’s lightweight `testing` install profile (not `standard`) to keep browser test runtime down. Front page routing is applied by `support_ticket_install()`.
 
 Kernel smoke test: `web/modules/custom/support_ticket/tests/src/Kernel/ModuleEnableTest.php`.
 
@@ -117,6 +129,6 @@ Planning and design docs remain at the repo root (`requirements-analysis.md`, `d
 
 ## Milestone status
 
-**M1 (scaffold):** Composer project, Lando, module/theme skeletons, Kernel smoke test, CI workflow.
+**M1–M5:** Config-as-code, domain services, Drupal integration, end-to-end flows, theme polish.
 
-Deferred to later milestones: config-as-code (`config/install`), domain services, `/tickets` View, Functional tests.
+**M6 (ship-ready):** Full Kernel + Functional suite in CI; acceptance criteria walkthrough in `test-results.md`; submission docs updated.

@@ -52,8 +52,8 @@ abstract class SupportTicketFunctionalTestBase extends BrowserTestBase {
     $view = \Drupal::entityTypeManager()->getStorage('view')->load('tickets');
     $this->assertNotNull($view, 'The tickets view must be installed.');
     $this->assertTrue($view->status(), 'The tickets view must be enabled.');
-    $this->config('system.site')->set('page.front', '/tickets')->save();
-    $this->rebuildAll();
+    // Views page routes are registered at router rebuild; required after install.
+    $this->container->get('router.builder')->rebuild();
   }
 
   /**
@@ -135,6 +135,16 @@ abstract class SupportTicketFunctionalTestBase extends BrowserTestBase {
    */
   protected function userAutocompleteValue(User $user): string {
     return $user->getAccountName() . ' (' . $user->id() . ')';
+  }
+
+  /**
+   * Reloads a ticket node from storage (clears static cache).
+   */
+  protected function reloadTicket(Node $ticket): ?Node {
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $storage->resetCache([$ticket->id()]);
+    $reloaded = $storage->load($ticket->id());
+    return $reloaded instanceof Node ? $reloaded : NULL;
   }
 
 }

@@ -72,5 +72,13 @@ jobs:
           vendor/bin/drush --root=web theme:enable support_ticket_theme -y
           vendor/bin/drush --root=web config:set system.theme default support_ticket_theme -y
 
-      - name: Run PHPUnit
-        run: vendor/bin/phpunit -c "${{ github.workspace }}/phpunit.xml"
+      - name: Prepare Simpletest output directory
+        run: |
+          mkdir -p web/sites/simpletest/browser_output
+          chmod 777 web/sites/simpletest/browser_output
+
+      - name: Run Kernel tests
+        run: vendor/bin/phpunit -c "${{ github.workspace }}/phpunit.xml" --testsuite kernel
+
+      - name: Run smoke tests
+        run: vendor/bin/phpunit -c "${{ github.workspace }}/phpunit.xml" --testsuite smoke

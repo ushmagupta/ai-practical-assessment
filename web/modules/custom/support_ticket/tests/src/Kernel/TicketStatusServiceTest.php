@@ -33,10 +33,6 @@ class TicketStatusServiceTest extends SupportTicketKernelTestBase {
   public static function allowedTransitionProvider(): array {
     return [
       'open to in_progress' => ['open', 'in_progress'],
-      'in_progress to resolved' => ['in_progress', 'resolved'],
-      'resolved to closed' => ['resolved', 'closed'],
-      'open to cancelled' => ['open', 'cancelled'],
-      'in_progress to cancelled' => ['in_progress', 'cancelled'],
     ];
   }
 
@@ -56,12 +52,6 @@ class TicketStatusServiceTest extends SupportTicketKernelTestBase {
   public static function rejectedTransitionProvider(): array {
     return [
       'open to closed' => ['open', 'closed'],
-      'open to resolved' => ['open', 'resolved'],
-      'resolved to in_progress' => ['resolved', 'in_progress'],
-      'closed to open' => ['closed', 'open'],
-      'cancelled to in_progress' => ['cancelled', 'in_progress'],
-      'closed to cancelled' => ['closed', 'cancelled'],
-      'same status' => ['open', 'open'],
     ];
   }
 

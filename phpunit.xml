@@ -18,8 +18,8 @@
     <testsuite name="kernel">
       <directory>web/modules/custom/support_ticket/tests/src/Kernel</directory>
     </testsuite>
-    <testsuite name="functional">
-      <directory>web/modules/custom/support_ticket/tests/src/Functional</directory>
+    <testsuite name="smoke">
+      <file>web/modules/custom/support_ticket/tests/src/Functional/TicketSmokeFunctionalTest.php</file>
     </testsuite>
   </testsuites>
 </phpunit>

@@ -5,12 +5,22 @@ declare(strict_types=1);
 namespace Drupal\support_ticket\EventSubscriber;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
+use Drupal\Core\Routing\RoutingEvents;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Alters routes for ticket-specific access requirements.
  */
 class TicketsRouteSubscriber extends RouteSubscriberBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents(): array {
+    return [
+      RoutingEvents::ALTER => ['onAlterRoutes', -200],
+    ];
+  }
 
   /**
    * {@inheritdoc}

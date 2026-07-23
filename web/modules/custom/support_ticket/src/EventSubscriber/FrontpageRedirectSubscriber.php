@@ -19,7 +19,7 @@ class FrontpageRedirectSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      KernelEvents::REQUEST => ['onRequest', 30],
+      KernelEvents::REQUEST => ['onRequest', 300],
     ];
   }
 
@@ -33,6 +33,12 @@ class FrontpageRedirectSubscriber implements EventSubscriberInterface {
 
     $request = $event->getRequest();
     $path = rtrim($request->getPathInfo(), '/') ?: '/';
+
+    if ($path === '/tickets' && \Drupal::currentUser()->isAnonymous()) {
+      $event->setResponse(new RedirectResponse('/user/login', RedirectResponse::HTTP_FOUND));
+      return;
+    }
+
     $front = \Drupal::config('system.site')->get('page.front');
 
     if ($path === '/node' || ($path === '/' && $front === '/node')) {
