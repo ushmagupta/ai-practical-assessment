@@ -227,3 +227,27 @@ Point 9 — extract hook logic (form alters, `hook_views_query_alter`, local tas
 dedicated OOP plugins or event subscribers instead of `\Drupal::service()` in
 `support_ticket.module`. Deferred: project rules allow thin procedural hooks; M4
 Functional work takes priority; refactor can follow if `.module` grows further.
+
+## July 23, 2026 — M6 ship-ready
+
+**Prompt:**
+Resume M6: full CI green, acceptance walkthrough, submission docs.
+
+**AI response summary:**
+Verified full suite green (38 tests, ~6 min Lando). Completed `test-results.md`
+acceptance mapping with deferrals per test-strategy P3; updated `candidate-info.md`
+(submission date July 23, 2026), `final-ai-usage-summary.md`, and `README.md`
+(smoke suite commands). Fixed anonymous 403 on `/` when `page.front` is `/tickets`
+(Issue 7 — manual review). Trimmed suite: 30 Kernel + 8 smoke HTTP tests.
+
+**Accepted:**
+M6 submission package — tests, acceptance walkthrough, candidate and AI summary docs.
+
+**Changed:**
+`test-results.md`, `candidate-info.md`, `final-ai-usage-summary.md`, `README.md`,
+`web/modules/custom/support_ticket/src/EventSubscriber/FrontpageRedirectSubscriber.php`,
+`web/modules/custom/support_ticket/tests/src/Functional/TicketSmokeFunctionalTest.php`,
+`debugging-notes.md`, `ai-prompts/debugging.md`, `ai-prompts/implementation.md`.
+
+**Rejected:**
+None.

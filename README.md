@@ -89,18 +89,22 @@ mkdir -p web/sites/simpletest/browser_output && chmod 777 web/sites/simpletest/b
 ```
 
 ```bash
-# Fast feedback — Kernel only (~1 min)
+# Fast feedback — Kernel only (~2 min)
 lando phpunit --testsuite kernel
 
-# Full suite — Kernel + Functional browser tests
+# HTTP smoke tests (~4 min)
+lando phpunit --testsuite smoke
+
+# Full suite — Kernel + smoke (~6 min)
 lando phpunit
 
 # Without Lando (requires composer install)
 vendor/bin/phpunit -c phpunit.xml --testsuite kernel
+vendor/bin/phpunit -c phpunit.xml --testsuite smoke
 vendor/bin/phpunit -c phpunit.xml
 ```
 
-Functional tests use Drupal’s lightweight `testing` install profile (not `standard`) to keep browser test runtime down. Front page routing is applied by `support_ticket_install()`.
+Smoke tests use the `standard` profile with merged HTTP flows in `TicketSmokeFunctionalTest.php`. Front page routing is applied by `support_ticket_install()`.
 
 Kernel smoke test: `web/modules/custom/support_ticket/tests/src/Kernel/ModuleEnableTest.php`.
 
@@ -111,7 +115,7 @@ GitHub Actions workflow (`.github/workflows/ci.yml`) runs on push/PR to `main`:
 1. `composer install`
 2. `drush site:install standard`
 3. Enable `support_ticket` module and `support_ticket_theme`
-4. PHPUnit
+4. PHPUnit (Kernel + smoke suites)
 
 ## Project layout
 
@@ -131,4 +135,4 @@ Planning and design docs remain at the repo root (`requirements-analysis.md`, `d
 
 **M1–M5:** Config-as-code, domain services, Drupal integration, end-to-end flows, theme polish.
 
-**M6 (ship-ready):** Full Kernel + Functional suite in CI; acceptance criteria walkthrough in `test-results.md`; submission docs updated.
+**M6 (ship-ready):** Complete — 38 tests green in CI; acceptance walkthrough in `test-results.md`; submission docs updated (`candidate-info.md`, `final-ai-usage-summary.md`).
