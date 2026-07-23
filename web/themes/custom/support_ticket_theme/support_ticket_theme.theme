@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * @file
+ * Theme hooks and preprocess functions for Support Ticket theme.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_preprocess_HOOK() for node templates.
+ */
+function support_ticket_theme_preprocess_node(array &$variables): void {
+  $node = $variables['node'];
+  if (!$node instanceof NodeInterface || $node->bundle() !== 'ticket' || $variables['view_mode'] !== 'full') {
+    return;
+  }
+
+  $variables['hide_assignee'] = \Drupal::currentUser()->hasRole('reporter');
+  $variables['#cache']['contexts'][] = 'user.roles';
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for field templates.
+ */
+function support_ticket_theme_preprocess_field(array &$variables): void {
+  $element = $variables['element'];
+  $field_name = $element['#field_name'] ?? '';
+
+  if ($field_name === 'field_assigned_to' && ($element['#bundle'] ?? '') === 'ticket') {
+    $variables['hide_assignee'] = \Drupal::currentUser()->hasRole('reporter');
+    $variables['#cache']['contexts'][] = 'user.roles';
+    return;
+  }
+
+  if ($field_name !== 'comment' || ($element['#bundle'] ?? '') !== 'ticket') {
+    return;
+  }
+
+  $has_comments = !empty($variables['comments']);
+  $variables['comments_empty'] = !$has_comments;
+  if (!$has_comments) {
+    $variables['comments_empty_message'] = t('No comments yet.');
+  }
+}
+
+/**
+ * Builds role- and filter-aware empty list markup for the tickets view.
+ *
+ * @return array<string, mixed>
+ *   Render array for the empty table cell.
+ */
+function _support_ticket_theme_tickets_empty_build(ViewExecutable $view): array {
+  $account = \Drupal::currentUser();
+  $exposed = $view->getExposedInput();
+  $filter_keys = ['search', 'ticket_status', 'priority', 'ticket_type', 'assignee'];
+  $has_filters = FALSE;
+  foreach ($filter_keys as $key) {
+    if (!isset($exposed[$key]) || $exposed[$key] === '' || $exposed[$key] === 'All') {
+      continue;
+    }
+    $has_filters = TRUE;
+    break;
+  }
+
+  $cache = [
+    'contexts' => ['user.roles'],
+  ];
+
+  if ($has_filters) {
+    return [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#attributes' => ['class' => ['tickets-empty']],
+      '#value' => t('No tickets match your search.'),
+      '#cache' => $cache,
+    ];
+  }
+
+  if ($account->hasRole('reporter')) {
+    return _support_ticket_theme_tickets_empty_paragraph(
+      t('No tickets found.'),
+      t('Create your first ticket'),
+      Url::fromRoute('node.add', ['node_type' => 'ticket']),
+      t('to get started.'),
+      $cache,
+    );
+  }
+
+  if ($account->hasRole('agent')) {
+    return [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#attributes' => ['class' => ['tickets-empty']],
+      '#value' => t('No tickets found. There are no assigned or unassigned tickets in your queue right now.'),
+      '#cache' => $cache,
+    ];
+  }
+
+  return _support_ticket_theme_tickets_empty_paragraph(
+    t('No tickets found. Try clearing filters or'),
+    t('create a ticket'),
+    Url::fromRoute('node.add', ['node_type' => 'ticket']),
+    '.',
+    $cache,
+  );
+}
+
+/**
+ * Builds a paragraph render array with plain text and a link child.
+ *
+ * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $prefix
+ *   Leading text.
+ * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $link_title
+ *   Link label.
+ * @param array<string, mixed> $cache
+ *   Cache metadata for the render array.
+ *
+ * @return array<string, mixed>
+ *   Render array.
+ */
+function _support_ticket_theme_tickets_empty_paragraph(string|\Drupal\Core\StringTranslation\TranslatableMarkup $prefix, string|\Drupal\Core\StringTranslation\TranslatableMarkup $link_title, Url $url, string|\Drupal\Core\StringTranslation\TranslatableMarkup $suffix, array $cache): array {
+  return [
+    '#type' => 'html_tag',
+    '#tag' => 'p',
+    '#attributes' => ['class' => ['tickets-empty']],
+    'prefix' => ['#plain_text' => $prefix . ' '],
+    'link' => [
+      '#type' => 'link',
+      '#title' => $link_title,
+      '#url' => $url,
+    ],
+    'suffix' => ['#plain_text' => $suffix],
+    '#cache' => $cache,
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for views_view_table templates.
+ */
+function support_ticket_theme_preprocess_views_view_table(array &$variables): void {
+  $view = $variables['view'];
+  if ($view->id() !== 'tickets' || $view->current_display !== 'page_1' || !empty($view->result)) {
+    return;
+  }
+
+  $message = _support_ticket_theme_tickets_empty_build($view);
+
+  if (!empty($variables['rows'][0]['columns'][0]['content'][0])) {
+    $variables['rows'][0]['columns'][0]['content'][0]['field_output'] = $message;
+  }
+}

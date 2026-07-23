@@ -1,0 +1,60 @@
+{#
+/**
+ * @file
+ * Ticket detail page with terminal read-only affordance.
+ */
+#}
+{% set layout = layout ? 'layout--' ~ layout|clean_class %}
+
+{%
+  set classes = [
+    'node',
+    'node--type-' ~ node.bundle|clean_class,
+    layout ? 'grid-full',
+    node.isPromoted() ? 'node--promoted',
+    node.isSticky() ? 'node--sticky',
+    not node.isPublished() ? 'node--unpublished',
+    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+    ticket_terminal ? 'ticket--terminal',
+  ]
+%}
+<article{{ attributes.addClass(classes) }}>
+  <header class="{{ layout }}">
+    {{ title_prefix }}
+    {% if label and not page %}
+      <h2{{ title_attributes.addClass('node__title') }}>
+        <a href="{{ url }}" rel="bookmark">{{ label }}</a>
+      </h2>
+    {% endif %}
+    {{ title_suffix }}
+    {% if display_submitted %}
+      <div class="node__meta">
+        {% if author_picture %}
+          <div class="node__author-image">
+            {{ author_picture }}
+          </div>
+        {% endif %}
+        <span{{ author_attributes }}>
+          {{ 'By'|t }} {% apply spaceless %}{{ author_name }}{% endapply %}, {{ date }}
+        </span>
+        {{ metadata }}
+      </div>
+    {% endif %}
+  </header>
+  {% if ticket_read_only_message %}
+    <div class="ticket-read-only-notice" role="status">
+      {{ ticket_read_only_message }}
+    </div>
+  {% endif %}
+  <div{{ content_attributes.addClass('node__content', layout) }}>
+    {{ content|without('comment', 'field_assigned_to') }}
+    {% if content.field_assigned_to and not hide_assignee %}
+      {{ content.field_assigned_to }}
+    {% endif %}
+  </div>
+  {% if content.comment %}
+    <div id="comments" class="{{ layout }}">
+      {{ content.comment }}
+    </div>
+  {% endif %}
+</article>
